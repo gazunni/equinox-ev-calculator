@@ -3,9 +3,8 @@ headers = []
 redirects = []
 
 [build]
-edge_functions = "/opt/build/repo/netlify/edge-functions"
-publish = "/opt/build/repo"
-publishOrigin = "default"
+edge_functions = "netlify/edge-functions"
+publish = "."
 
   [build.environment]
 
