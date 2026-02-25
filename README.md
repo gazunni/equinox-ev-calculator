@@ -1,0 +1,1 @@
+Chevrolet Equinox EV Efficiency Calculator. Physics-based efficiency and range calculator for the 2024-2026 Equinox EV. Covers FWD and AWD variants with real-world scenario modelling including temperature, HVAC, load, grade, wind and traffic conditions.
