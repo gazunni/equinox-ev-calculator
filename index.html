@@ -387,6 +387,24 @@ function fallbackCopy(url){
 try{if(window.location&&window.location.hash)decodeState(window.location.hash);}catch(e){}
 
 // ================================================================
+// GEO DEFAULTS (from Netlify edge function)
+// ================================================================
+// Apply geo-detected defaults only when no permalink hash is present.
+// If the user arrived via a shared link, the hash state takes priority.
+(function applyGeoDefaults(){
+  try{
+    if(window.__GEO__&&!(window.location&&window.location.hash&&window.location.hash.length>1)){
+      ST.metric=!!window.__GEO__.defaultMetric;
+      if(window.__GEO__.defaultScenario){
+        ST.activeScenario=window.__GEO__.defaultScenario;
+        var sc=typeof SCENARIOS!=='undefined'&&SCENARIOS.filter(function(s){return s.key===window.__GEO__.defaultScenario;})[0];
+        if(sc)Object.assign(ST,sc.params);
+      }
+    }
+  }catch(e){}
+})();
+
+// ================================================================
 // DOM HELPERS
 // ================================================================
 function el(tag,attrs,ch){
