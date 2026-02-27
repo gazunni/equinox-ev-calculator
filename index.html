@@ -89,7 +89,7 @@ h1 span{
 .branch{
   background:var(--card);border:1px solid var(--border);border-radius:20px;
   padding:36px 32px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;
-  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
 }
 .branch::before{
   content:'';position:absolute;inset:0;border-radius:20px;opacity:0;
@@ -115,7 +115,6 @@ h1 span{
   display:inline-flex;align-items:center;gap:8px;
   font-size:13px;font-weight:700;padding:10px 20px;border-radius:9px;
   border:none;cursor:pointer;font-family:var(--body);transition:all .2s;
-  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
 }
 .branch-simple .branch-cta{background:var(--green);color:#031a0a;}
 .branch-simple .branch-cta:hover{background:#4dffa0;}
@@ -267,7 +266,7 @@ canvas#wf{display:block;width:100%;border-radius:8px;}
 
   <div class="branches">
     <!-- SIMPLE BRANCH -->
-    <div class="branch branch-simple" onclick="goGuided()" role="button" tabindex="0" ontouchend="goGuided()">
+    <div class="branch branch-simple" onclick="goGuided()">
       <span class="branch-icon">🔋</span>
       <span class="branch-tag">New owner · Quick answer</span>
       <h2>Why did my range change?</h2>
@@ -278,11 +277,11 @@ canvas#wf{display:block;width:100%;border-radius:8px;}
         <div class="bf">Visual breakdown chart</div>
       </div>
       <br/>
-      <button class="branch-cta" onclick="goGuided()" ontouchend="goGuided()">Show me why <span class="branch-cta-arrow">→</span></button>
+      <button class="branch-cta">Show me why <span class="branch-cta-arrow">→</span></button>
     </div>
 
     <!-- ADVANCED BRANCH -->
-    <div class="branch branch-advanced" onclick="goAdvanced()" role="button" tabindex="0" ontouchend="goAdvanced()">
+    <div class="branch branch-advanced" onclick="goAdvanced()">
       <span class="branch-icon">⚙️</span>
       <span class="branch-tag">Enthusiast · Full control</span>
       <h2>Explore the full physics</h2>
@@ -293,7 +292,7 @@ canvas#wf{display:block;width:100%;border-radius:8px;}
         <div class="bf">Imperial & Metric</div>
       </div>
       <br/>
-      <button class="branch-cta" onclick="goAdvanced()" ontouchend="goAdvanced()">Open calculator <span class="branch-cta-arrow">→</span></button>
+      <button class="branch-cta">Open calculator <span class="branch-cta-arrow">→</span></button>
     </div>
   </div>
 </section>
