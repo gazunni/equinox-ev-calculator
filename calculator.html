@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><!-- v20260226-V4.3 -->
+<html lang="en"><!-- v20260226-V4.5 -->
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
@@ -107,8 +107,8 @@ canvas{display:block;border-radius:8px}
 .adv-toggle-left{display:flex;align-items:center;gap:10px}
 .adv-toggle-icon{font-size:14px}
 .adv-toggle-text{font-size:12px;font-weight:700;color:#94a3b8}
-.adv-toggle-sub{font-size:10px;color:green;margin-top:1px}
-.adv-chevron{font-size:14px;color:orange;transition:transform .3s}
+.adv-toggle-sub{font-size:10px;color:var(--text-muted);margin-top:1px}
+.adv-chevron{font-size:14px;color:var(--text-muted);transition:transform .3s}
 .adv-chevron.open{transform:rotate(180deg)}
 .adv-body{max-height:0;overflow:hidden;transition:max-height .45s cubic-bezier(.4,0,.2,1)}
 .adv-body.open{max-height:1200px}
@@ -845,7 +845,7 @@ function updateDeltaStrip(){
     box.querySelector('.dbox-eff').textContent=dEff(cur);
     box.querySelector('.dbox-eff').style.color=col;
     var rangeVal=Math.round((ST.metric?cur/1.60934:cur)*(c.pack*(ST.soh/100)));
-    box.querySelector('.dbox-range').textContent='🔋 '+dRange(rangeVal);
+    box.querySelector('.dbox-range').textContent='🔋 ~'+dRange(rangeVal);
     var dEl=box.querySelector('.dbox-delta');
     if(Math.abs(delta)<0.005){
       dEl.textContent='= Base';dEl.style.color='#475569';
@@ -974,6 +974,7 @@ function buildApp(){
   var hdr=el('div',{style:{borderBottom:'1px solid #1e293b',paddingBottom:'10px',marginBottom:'9px',
     display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:'8px'}});
   var hl=el('div',{style:{display:'flex',alignItems:'center',gap:'9px'}});
+  hl.appendChild(el('a',{href:'/',style:{fontSize:'10px',color:'#334155',textDecoration:'none',fontFamily:"var(--mono)",letterSpacing:'.05em',marginRight:'4px',transition:'color .15s',onmouseover:"this.style.color='#64748b'",onmouseout:"this.style.color='#334155'"}},'← Home'));
   hl.appendChild(el('span',{style:{background:'#1d4ed8',color:'#fff',padding:'2px 8px',borderRadius:'4px',fontSize:'9px',fontWeight:'800',letterSpacing:'.05em'}},'EE v8'));
   var ti=el('div',null);
   ti.appendChild(el('div',{style:{fontSize:'16px',fontWeight:'800',color:'#fff',letterSpacing:'-.01em'}},'Chevrolet Equinox EV — Efficiency Calculator'));
@@ -1096,7 +1097,8 @@ function buildApp(){
 
   // ── FOOTER ──
   app.appendChild(el('div',{style:{marginTop:'10px',textAlign:'center',fontSize:'9px',color:'#90EE90',paddingBottom:'14px'}},
-    'Equinox EV Efficiency Model | Physics-based | 2024–2026 | Not affiliated with GM | created by gazunni'));
+    'Equinox EV Efficiency Model | Physics-based educational tool | 2024–2026 | created by gazunni'),el('div',{style:{marginTop:'5px',fontSize:'8px',color:'#334155',maxWidth:'700px',margin:'5px auto 0',lineHeight:'1.6',textAlign:'center'}},
+    'Physics-based educational tool. Results are modelled estimates for informational purposes only — not for trip planning or safety-critical decisions. Real-world range varies with driving behaviour, vehicle condition, and factors not captured in this model. Not affiliated with or endorsed by General Motors Corporation.'));
 
   updDT();updateEpaLabel();
 
@@ -1134,7 +1136,7 @@ function updDT(){
 
 function updateEpaLabel(){
   var ep=$id('epa-el');
-  if(ep){var c=CFG[ST.dt];ep.textContent=c.label+' | '+c.epa_mi+' mi | '+c.mpge+' MPGe';}
+  if(ep){var c=CFG[ST.dt];ep.textContent=c.label+' | EPA '+c.epa_mi+' mi | '+c.mpge+' MPGe | estimates only';}
 }
 
 // ================================================================
@@ -1330,7 +1332,7 @@ function bChart(){
   var meta=el('div',{class:'chart-meta'});
   var tl=el('div',null);
   tl.appendChild(el('div',{class:'chart-title'},'📊 '+dUnit()+' vs Speed — '+ST.dt.toUpperCase()));
-  tl.appendChild(el('div',{class:'chart-hint'},'Solid bar = current conditions · Ghost outline = Perfect Day base case · Gap = efficiency penalty'));
+  tl.appendChild(el('div',{class:'chart-hint'},'Modelled estimates · Solid bar = current · Ghost = Perfect Day base · Gap = penalty · Actual results vary'));
   meta.appendChild(tl);
   var cond=el('div',{class:'chart-conditions',id:'chart-cond'});
   meta.appendChild(cond);
@@ -1354,6 +1356,8 @@ function bChart(){
     ds.appendChild(box);
   });
   card.appendChild(ds);
+  card.appendChild(el('div',{style:{fontSize:'8px',color:'#475569',marginTop:'6px',textAlign:'right',fontStyle:'italic'}},
+    '~ Modelled range estimates for educational purposes only. Actual range varies with driving conditions and vehicle state.'));
   tabContent.appendChild(card);
 
   // canvas events
@@ -1389,7 +1393,7 @@ function bChart(){
         '<b style="color:'+(+pct>=0?'#22c55e':+pct>-5?'#facc15':'#f97316')+'">'+sign+pct+'%</b><br>'+
         '<span style="color:#94a3b8">vs Perfect Day: </span>'+
         '<b style="color:'+(bdelta>=0?'#22c55e':'#f87171')+'">'+(bdelta>=0?'+':'')+dEffL(bdelta)+' ('+( +bpct>=0?'+':'')+bpct+'%)</b><br>'+
-        '<span style="color:#94a3b8">&#128283; Est range: </span><b style="color:#e2e8f0">'+dRange(rng)+'</b>';
+        '<span style="color:#94a3b8">&#128283; Modelled range: </span><b style="color:#e2e8f0">'+dRange(rng)+'</b>';
       chartTip.style.maxWidth='210px';chartTip.style.lineHeight='1.9';
       chartTip.style.display='block';
       var tx=ev.clientX-r.left+12;if(tx+210>r.width)tx=ev.clientX-r.left-225;
@@ -1467,7 +1471,7 @@ function bBd(){
     var ss=$id('bd-strip');ss.innerHTML='';
     [['🔌 Battery',(bd.Pb/1000).toFixed(2)+' kW','#fff'],
      [dUnit(),effD.toFixed(3),effCol(bd.eff,ST.dt)],
-     ['🗺️ Est. Range',dRange(Math.round(bd.eff*(c.pack*(ST.soh/100)))),'#e2e8f0'],
+     ['🗺️ Modelled Range',dRange(Math.round(bd.eff*(c.pack*(ST.soh/100)))),'#e2e8f0'],
      ['💨 Aero Speed',dSpeed(ST.selSpd+ST.wind),ST.wind!==0?'#fbbf24':'#94a3b8'],
      ['⚖️ Total Mass',dMass(bd.mass),'#a78bfa'],
      ['🌡️ Cabin dT',Math.abs(ST.cabinT-ST.ambientT)+(ST.metric?' C':' F'),Math.abs(ST.cabinT-ST.ambientT)>30?'#f87171':'#94a3b8']
@@ -1514,7 +1518,7 @@ function bBd(){
 function bTable(){
   var card=el('div',{class:'card',style:{overflowX:'auto'}});
   card.appendChild(el('div',{style:{fontSize:'13px',fontWeight:'700',color:'#e2e8f0',marginBottom:'8px'}},
-    '📋 Data Table — '+dUnit()+' | kW | est. range'));
+    '📋 Data Table — '+dUnit()+' | kW | modelled range (estimate)'));
   ['fwd','awd'].forEach(function(dk){
     var c=CFG[dk];
     var er=ST.metric?Math.round(mToK(c.epa_mi))+' km':c.epa_mi+' mi';
@@ -1537,7 +1541,7 @@ function bTable(){
         var td2=el('td',null);
         td2.appendChild(el('div',{class:'mono',style:{fontWeight:'700',fontSize:'12px',color:col}},eff.toFixed(2)));
         td2.appendChild(el('div',{class:'mono',style:{fontSize:'9px',color:'#64748b'}},(p.Pb/1000).toFixed(1)+' kW'));
-        td2.appendChild(el('div',{class:'mono',style:{fontSize:'9px',color:'#475569'}},'🔋 '+dRange(Math.round(p.eff*(c.pack*(ST.soh/100))))));
+        td2.appendChild(el('div',{class:'mono',style:{fontSize:'9px',color:'#475569'}},'🔋 ~'+dRange(Math.round(p.eff*(c.pack*(ST.soh/100))))));
         row.appendChild(td2);
       });
       tbody.appendChild(row);
@@ -1570,6 +1574,7 @@ function bModel(){
    ['🎡 Steering wheel heater','25W resistive'],['🪟 Rear defrost+mirrors','~250W resistive'],
    ['🔋 Base case definition','70°F · calm · solo · 42PSI · cruise · 100% SOH'],
    ['🏔️ Altitude model','ISA std atmosphere rho*(1-2.2558e-5*h)^5.2559'],
+   ['⚠️ Disclaimer','Educational estimates only · Not affiliated with GM · Real-world results vary'],
    ['🔋 SOH effect','Range (kWh) + small Ri loss: 80% SOH ≈ 2% extra battery loss'],
    ['🛞 Load Crr scaling','+0.00004 per 100kg over base mass (tire deformation)'],
    ['🔥 Heat pump COP','Linear interp: 1.0@0°F → 1.55@20°F → 2.0@30°F → 2.5@45°F → 3.0@60°F+'],
