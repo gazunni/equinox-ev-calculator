@@ -650,7 +650,7 @@ function buildWaterfall(season, driveType, dk){
     isAnchor:true,anchorType:'end',
     color:'#39d98a',emoji:'🏁',
     tip:{title:'🏁 Your Range Today',km:actualRangeKm+' km',
-      body:'This is your modelled range estimate for today\'s conditions. This is normal and expected — physics models predict this outcome. Actual range varies with your specific driving. As temperatures improve, your range will too. <span style='color:#475569;font-size:13px'>These are modelled estimates — actual range varies with your specific driving conditions.</span>'}
+      body:'This is your modelled range estimate for today\'s conditions. This is normal and expected — physics models predict this outcome. Actual range varies with your specific driving. As temperatures improve, your range will too.'}
   });
 
   return{bars:bars,baseKm:baseRangeKm,actualKm:actualRangeKm,preset:preset,dk:actualDk,cfg:cfg,traffic:traffic};
