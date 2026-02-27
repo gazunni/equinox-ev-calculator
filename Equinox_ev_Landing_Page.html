@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en"><!-- equinox-landing-v1.2 -->
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Equinox EV — Range Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#030b1a;
+  --bg2:#061224;
+  --card:#0a1628;
+  --border:#0f2240;
+  --border2:#1a3560;
+  --green:#39d98a;
+  --green-dim:rgba(57,217,138,0.12);
+  --blue:#3b9eff;
+  --blue-dim:rgba(59,158,255,0.12);
+  --orange:#ff8c42;
+  --purple:#a78bfa;
+  --yellow:#fbbf24;
+  --red:#f87171;
+  --text:#e8f4ff;
+  --text2:#7a9cc0;
+  --text3:#3d6080;
+  --mono:'DM Mono',monospace;
+  --head:'Syne',sans-serif;
+  --body:'Space Grotesk',sans-serif;
+}
+html,body{width:100%;min-height:100%;background:var(--bg);font-family:var(--body);color:var(--text);overflow-x:hidden}
+
+/* ── BACKGROUND ── */
+.bg-grid{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(rgba(59,158,255,0.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(59,158,255,0.03) 1px,transparent 1px);
+  background-size:60px 60px;
+}
+.bg-glow{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(59,158,255,0.08),transparent),
+             radial-gradient(ellipse 40% 30% at 80% 60%,rgba(57,217,138,0.05),transparent);
+}
+
+/* ── LAYOUT ── */
+#root{position:relative;z-index:1;min-height:100vh;}
+
+/* ── LANDING ── */
+#landing{
+  display:flex;flex-direction:column;align-items:center;
+  padding:60px 20px 40px;min-height:100vh;
+}
+.logo-row{display:flex;align-items:center;gap:12px;margin-bottom:48px;animation:fadeUp .6s ease both;}
+.logo-chip{
+  background:linear-gradient(135deg,#1d4ed8,#1e40af);
+  color:#fff;padding:4px 10px;border-radius:5px;
+  font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.08em;
+}
+.logo-name{font-family:var(--mono);font-size:12px;color:var(--text2);letter-spacing:.1em;text-transform:uppercase;}
+
+.hero{text-align:center;max-width:680px;margin-bottom:64px;animation:fadeUp .7s .1s ease both;}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--green-dim);border:1px solid rgba(57,217,138,0.2);
+  color:var(--green);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  padding:5px 14px;border-radius:99px;margin-bottom:24px;
+}
+.hero-eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+
+h1{
+  font-family:var(--head);font-size:clamp(36px,6vw,68px);font-weight:800;
+  line-height:1.05;letter-spacing:-.02em;color:#fff;margin-bottom:20px;
+}
+h1 span{
+  background:linear-gradient(135deg,var(--green),var(--blue));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero-sub{font-size:17px;color:var(--text2);line-height:1.65;max-width:520px;margin:0 auto;}
+
+/* ── BRANCH CARDS ── */
+.branches{
+  display:grid;grid-template-columns:1fr 1fr;gap:20px;
+  width:100%;max-width:860px;animation:fadeUp .7s .2s ease both;
+}
+@media(max-width:620px){.branches{grid-template-columns:1fr;}}
+
+.branch{
+  background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:36px 32px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;
+}
+.branch::before{
+  content:'';position:absolute;inset:0;border-radius:20px;opacity:0;
+  transition:opacity .25s;
+}
+.branch-simple::before{background:radial-gradient(ellipse at top left,rgba(57,217,138,0.08),transparent 60%);}
+.branch-advanced::before{background:radial-gradient(ellipse at top left,rgba(59,158,255,0.08),transparent 60%);}
+.branch:hover{transform:translateY(-3px);border-color:var(--border2);}
+.branch:hover::before{opacity:1;}
+.branch-simple:hover{border-color:rgba(57,217,138,0.3);box-shadow:0 20px 60px rgba(57,217,138,0.08);}
+.branch-advanced:hover{border-color:rgba(59,158,255,0.3);box-shadow:0 20px 60px rgba(59,158,255,0.08);}
+
+.branch-icon{font-size:36px;margin-bottom:18px;display:block;}
+.branch-tag{
+  display:inline-block;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  padding:3px 9px;border-radius:4px;margin-bottom:14px;
+}
+.branch-simple .branch-tag{background:var(--green-dim);color:var(--green);}
+.branch-advanced .branch-tag{background:var(--blue-dim);color:var(--blue);}
+.branch h2{font-family:var(--head);font-size:22px;font-weight:800;color:#fff;margin-bottom:10px;line-height:1.2;}
+.branch p{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:24px;}
+.branch-cta{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:13px;font-weight:700;padding:10px 20px;border-radius:9px;
+  border:none;cursor:pointer;font-family:var(--body);transition:all .2s;
+}
+.branch-simple .branch-cta{background:var(--green);color:#031a0a;}
+.branch-simple .branch-cta:hover{background:#4dffa0;}
+.branch-advanced .branch-cta{background:var(--blue);color:#010d1f;}
+.branch-advanced .branch-cta:hover{background:#6ab8ff;}
+.branch-cta-arrow{transition:transform .2s;}
+.branch:hover .branch-cta-arrow{transform:translateX(4px);}
+
+.branch-features{margin-top:0;}
+.bf{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text3);margin-bottom:6px;}
+.bf::before{content:'✓';font-size:10px;font-weight:700;}
+.branch-simple .bf::before{color:var(--green);}
+.branch-advanced .bf::before{color:var(--blue);}
+
+/* ── GUIDED MODE ── */
+#guided{display:none;padding:40px 20px;max-width:680px;margin:0 auto;}
+.guided-header{text-align:center;margin-bottom:40px;animation:fadeUp .5s ease both;}
+.guided-header h2{font-family:var(--head);font-size:32px;font-weight:800;color:#fff;margin-bottom:8px;}
+.guided-header p{font-size:14px;color:var(--text2);}
+
+.questions{display:flex;flex-direction:column;gap:24px;}
+.q-block{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;animation:fadeUp .5s ease both;}
+.q-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:14px;}
+.q-title{font-size:16px;font-weight:600;color:var(--text);margin-bottom:16px;}
+.q-options{display:flex;flex-wrap:wrap;gap:8px;}
+.q-opt{
+  padding:9px 18px;border-radius:9px;border:1px solid var(--border);
+  background:transparent;color:var(--text2);font-family:var(--body);font-size:13px;
+  font-weight:500;cursor:pointer;transition:all .15s;
+}
+.q-opt:hover{border-color:var(--border2);color:var(--text);}
+.q-opt.sel{border-color:var(--green);background:var(--green-dim);color:var(--green);}
+
+.calc-btn{
+  width:100%;padding:16px;border-radius:12px;border:none;
+  background:linear-gradient(135deg,var(--green),#1eb86a);
+  color:#031a0a;font-family:var(--head);font-size:16px;font-weight:800;
+  cursor:pointer;transition:all .2s;margin-top:8px;letter-spacing:.02em;
+  opacity:.4;pointer-events:none;
+}
+.calc-btn.ready{opacity:1;pointer-events:all;}
+.calc-btn.ready:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(57,217,138,0.25);}
+
+/* ── RESULT ── */
+#result{display:none;padding:40px 20px;max-width:800px;margin:0 auto;}
+.result-header{text-align:center;margin-bottom:36px;}
+.result-header h2{font-family:var(--head);font-size:28px;font-weight:800;color:#fff;margin-bottom:6px;}
+.result-header p{font-size:14px;color:var(--text2);}
+
+.waterfall-wrap{
+  background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:32px;margin-bottom:20px;
+}
+.wf-title{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:24px;}
+
+#wf-canvas-wrap{position:relative;width:100%;}
+canvas#wf{display:block;width:100%;border-radius:8px;}
+
+/* tooltip */
+.wf-tip{
+  position:absolute;pointer-events:none;display:none;
+  background:#020c1a;border:1px solid var(--border2);border-radius:12px;
+  padding:14px 18px;min-width:220px;max-width:280px;z-index:20;
+  box-shadow:0 8px 40px rgba(0,0,0,.7);
+}
+.wf-tip-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:6px;}
+.wf-tip-km{font-family:var(--mono);font-size:22px;font-weight:500;margin-bottom:8px;}
+.wf-tip-body{font-size:12px;color:var(--text2);line-height:1.65;}
+
+.result-plain{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:24px;margin-bottom:20px;
+}
+.plain-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:12px;}
+.plain-text{font-size:15px;color:var(--text);line-height:1.75;}
+.plain-text strong{color:#fff;}
+.plain-text .highlight{color:var(--green);font-weight:600;}
+
+.result-actions{display:flex;gap:12px;flex-wrap:wrap;}
+.act-btn{
+  flex:1;min-width:160px;padding:13px 20px;border-radius:11px;
+  font-family:var(--body);font-size:13px;font-weight:700;cursor:pointer;
+  transition:all .2s;border:none;text-align:center;
+}
+.act-primary{background:var(--blue);color:#010d1f;}
+.act-primary:hover{background:#6ab8ff;}
+.act-secondary{background:var(--card);border:1px solid var(--border2);color:var(--text2);}
+.act-secondary:hover{color:var(--text);border-color:var(--green);}
+
+/* ── BACK BUTTON ── */
+.back-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  background:transparent;border:none;color:var(--text3);
+  font-family:var(--body);font-size:13px;cursor:pointer;
+  padding:8px 0;margin-bottom:24px;transition:color .15s;
+}
+.back-btn:hover{color:var(--text2);}
+
+/* ── UNIT TOGGLE ── */
+.unit-toggle{
+  display:flex;align-items:center;gap:6px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:99px;padding:4px;margin-bottom:32px;
+  animation:fadeUp .6s .05s ease both;
+}
+.unit-opt{
+  padding:7px 20px;border-radius:99px;border:none;
+  font-family:var(--body);font-size:12px;font-weight:700;
+  cursor:pointer;transition:all .2s;letter-spacing:.04em;
+  background:transparent;color:var(--text3);
+}
+.unit-opt.active{background:var(--blue);color:#fff;box-shadow:0 2px 12px rgba(59,158,255,0.3);}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── LEGEND ── */
+.wf-legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px;}
+.wf-leg{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);}
+.wf-leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+<div id="root">
+
+<!-- ══════════════════════════════════════════
+     LANDING PAGE
+══════════════════════════════════════════ -->
+<section id="landing">
+  <div class="logo-row">
+    <span class="logo-chip">EQUINOX EV</span>
+    <span class="logo-name">Range Intelligence</span>
+  </div>
+
+  <div class="unit-toggle" id="unit-toggle">
+    <button class="unit-opt" id="ut-km" onclick="setUnit('km')">🇨🇦 Kilometres</button>
+    <button class="unit-opt" id="ut-mi" onclick="setUnit('mi')">🇺🇸 Miles</button>
+  </div>
+
+  <div class="hero">
+    <div class="hero-eyebrow">
+      <span></span>Physics-based · 2024–2026 Chevrolet Equinox EV
+    </div>
+    <h1>The car tells you <span>what.</span><br>This tells you <span>why.</span></h1>
+    <p class="hero-sub">Your Equinox EV showed 320 km this morning. Now it says 190 km. Nothing is wrong with your car — but understanding <em>why</em> makes all the difference.</p>
+  </div>
+
+  <div class="branches">
+    <!-- SIMPLE BRANCH -->
+    <div class="branch branch-simple" onclick="goGuided()">
+      <span class="branch-icon">🔋</span>
+      <span class="branch-tag">New owner · Quick answer</span>
+      <h2>Why did my range change?</h2>
+      <p>Answer three simple questions. Get a clear, visual explanation of exactly where your range went — no jargon, no guesswork.</p>
+      <div class="branch-features">
+        <div class="bf">Takes under 60 seconds</div>
+        <div class="bf">Plain English explanations</div>
+        <div class="bf">Visual breakdown chart</div>
+      </div>
+      <br/>
+      <button class="branch-cta">Show me why <span class="branch-cta-arrow">→</span></button>
+    </div>
+
+    <!-- ADVANCED BRANCH -->
+    <div class="branch branch-advanced" onclick="goAdvanced()">
+      <span class="branch-icon">⚙️</span>
+      <span class="branch-tag">Enthusiast · Full control</span>
+      <h2>Explore the full physics</h2>
+      <p>Every variable. Every condition. Adjust speed, temperature, wind, grade, load, tire pressure and more with a live animated chart.</p>
+      <div class="branch-features">
+        <div class="bf">8 real-world scenarios</div>
+        <div class="bf">FWD & AWD comparison</div>
+        <div class="bf">Imperial & Metric</div>
+      </div>
+      <br/>
+      <button class="branch-cta">Open calculator <span class="branch-cta-arrow">→</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     GUIDED MODE — 3 QUESTIONS
+══════════════════════════════════════════ -->
+<section id="guided">
+  <button class="back-btn" onclick="goHome()">← Back</button>
+  <div class="guided-header">
+    <h2>Let's figure out your range</h2>
+    <p>Three quick questions and we'll show you exactly what's happening</p>
+  </div>
+
+  <div class="questions">
+    <!-- Q1: Season -->
+    <div class="q-block" style="animation-delay:.05s">
+      <div class="q-label">Question 1 of 3</div>
+      <div class="q-title">What's it like outside right now?</div>
+      <div class="q-options" id="q1">
+        <button class="q-opt" data-q="1" data-v="deep_winter" onclick="pick(this)">🥶 Deep winter (below -10°C / 14°F)</button>
+        <button class="q-opt" data-q="1" data-v="mild_winter" onclick="pick(this)">🧥 Mild winter (-10°C to 5°C / 14–41°F)</button>
+        <button class="q-opt" data-q="1" data-v="spring_fall" onclick="pick(this)">🍂 Spring / Fall (5°C to 18°C / 41–65°F)</button>
+        <button class="q-opt" data-q="1" data-v="summer" onclick="pick(this)">☀️ Summer (above 18°C / 65°F)</button>
+        <button class="q-opt" data-q="1" data-v="hot_summer" onclick="pick(this)">🌡️ Hot summer (above 30°C / 86°F)</button>
+      </div>
+    </div>
+
+    <!-- Q2: Driving -->
+    <div class="q-block" style="animation-delay:.1s">
+      <div class="q-label">Question 2 of 3</div>
+      <div class="q-title">What kind of driving are you doing?</div>
+      <div class="q-options" id="q2">
+        <button class="q-opt" data-q="2" data-v="city" onclick="pick(this)">🏙️ City — lots of stops and traffic lights</button>
+        <button class="q-opt" data-q="2" data-v="highway" onclick="pick(this)">🛣️ Highway — steady speed, mostly open road</button>
+        <button class="q-opt" data-q="2" data-v="mixed" onclick="pick(this)">🚗 Mixed — a bit of both</button>
+      </div>
+    </div>
+
+    <!-- Q3: Drivetrain -->
+    <div class="q-block" style="animation-delay:.15s">
+      <div class="q-label">Question 3 of 3</div>
+      <div class="q-title">Which Equinox EV do you have?</div>
+      <div class="q-options" id="q3">
+        <button class="q-opt" data-q="3" data-v="fwd" onclick="pick(this)">⚡ FWD — Single Motor (108 MPGe · 319 mi / 513 km)</button>
+        <button class="q-opt" data-q="3" data-v="awd" onclick="pick(this)">⚡⚡ AWD — Dual Motor (103 MPGe · 307 mi / 494 km)</button>
+        <button class="q-opt" data-q="3" data-v="unsure" onclick="pick(this)">🤔 Not sure — use FWD as default</button>
+      </div>
+    </div>
+
+    <button class="calc-btn" id="calc-btn" onclick="showResult()">Show me what happened to my range →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     RESULT
+══════════════════════════════════════════ -->
+<section id="result">
+  <button class="back-btn" onclick="goGuided()">← Change answers</button>
+  <div class="result-header">
+    <h2 id="result-title">Here's where your range went</h2>
+    <p id="result-sub">Based on your conditions today</p>
+  </div>
+
+  <div class="waterfall-wrap">
+    <div class="wf-title">Range breakdown — km from full charge</div>
+    <div id="wf-canvas-wrap">
+      <canvas id="wf"></canvas>
+      <div class="wf-tip" id="wf-tip">
+        <div class="wf-tip-title" id="tip-title"></div>
+        <div class="wf-tip-km" id="tip-km"></div>
+        <div class="wf-tip-body" id="tip-body"></div>
+      </div>
+    </div>
+    <div class="wf-legend" id="wf-legend"></div>
+  </div>
+
+  <div class="result-plain">
+    <div class="plain-label">In plain English</div>
+    <div class="plain-text" id="plain-text"></div>
+  </div>
+
+  <div class="result-actions">
+    <button class="act-btn act-primary" onclick="goAdvanced()">⚙️ Explore full calculator</button>
+    <button class="act-btn act-secondary" onclick="goGuided()">🔄 Try different conditions</button>
+  </div>
+</section>
+
+</div><!-- #root -->
+
+<script>
+'use strict';
+
+// ================================================================
+// UNIT STATE
+// ================================================================
+var METRIC = true; // default km, user picks on landing
+
+function dDisp(km){
+  if(METRIC) return km+' km';
+  return Math.round(km/1.60934)+' mi';
+}
+function dDispSigned(km, isLoss){
+  var v = METRIC ? km : Math.round(km/1.60934);
+  return (isLoss?'-':'+')+v+(METRIC?' km':' mi');
+}
+
+function setUnit(u){
+  METRIC = (u==='km');
+  document.getElementById('ut-km').classList.toggle('active', METRIC);
+  document.getElementById('ut-mi').classList.toggle('active', !METRIC);
+  // If result is showing, redraw
+  if(WF_DATA){
+    drawWaterfall(WF_DATA);
+    buildLegend(WF_DATA.bars);
+    buildPlainText(WF_DATA);
+  }
+}
+
+// ================================================================
+// PHYSICS (minimal — same engine as main calculator)
+// ================================================================
+var CFG={
+  fwd:{label:'FWD Single Motor',eta:0.882,massAdd:0,pack:79,epa_mi:319,epa_km:513},
+  awd:{label:'AWD Dual Motor',  eta:0.848,massAdd:68,pack:79,epa_mi:307,epa_km:494}
+};
+var BM=2041,BCD=0.29,BA=2.60,BCR=0.009,GG=9.81,PACC=400,UA=160,AWD_CRR=0.0004;
+
+function rho(f){return 1.2929*273.15/((f-32)*5/9+273.15);}
+function hpCOP(f){
+  if(f>=60)return 3.0;
+  if(f>=45)return 2.5+(f-45)*(0.5/15);
+  if(f>=30)return 2.0+(f-30)*(0.5/15);
+  if(f>=20)return 1.55+(f-20)*(0.45/10);
+  if(f>=0) return 1.0+(f-0)*(0.55/20);
+  return 1.0;
+}
+function acCOP(f){return f<=85?3:2.5;}
+function bEta(f){
+  if(f>=60)return 1.000;if(f>=40)return 0.975;
+  if(f>=20)return 0.945;if(f>=5)return 0.905;return 0.875;
+}
+function eCrr(p,aw,mass){
+  var base=Math.max(0.007,BCR+(36-p)*0.00015);
+  if(aw)base+=AWD_CRR;
+  if(mass&&mass>BM)base+=0.00004*((mass-BM)/100);
+  return base;
+}
+
+function calcEff(mph,af,dk,cf,seat,whl,defrost,wind,pax,psi,traffic){
+  var cfg=CFG[dk];
+  var mass=BM+cfg.massAdd+pax*82;
+  var Cd=BCD,Av=BA;
+  var Crr=eCrr(psi,cfg.awd,mass);
+  var vg=mph*0.44704,va=Math.max(0,(mph+wind)*0.44704);
+  var avgFrac=traffic==='stopgo'?0.38:traffic==='mixed'?0.72:1.0;
+  var uaFrac=traffic==='stopgo'?0.75:traffic==='mixed'?0.90:1.0;
+  var Pa=0.5*rho(af)*Cd*Av*va*va*va;
+  var Pr=Crr*mass*GG*vg;
+  var Pt=(Pa+Pr)/cfg.eta;
+  var effUA=UA*uaFrac;
+  var avgMph=mph*avgFrac;
+  var dT=cf-af;
+  var Ph_raw=0;
+  if(dT>2)Ph_raw=effUA*dT/hpCOP(af);
+  else if(dT<-2)Ph_raw=(effUA*Math.abs(dT))*0.55/acCOP(af);
+  var Ph=avgMph>0?Ph_raw*(mph/avgMph):Ph_raw;
+  var Ps=seat?140:0,Pw=whl?25:0;
+  var be=bEta(af);
+  var Pb=(Pt+Ph+Ps+Pw+PACC)/be;
+  return{eff:vg>0?Math.max(0,mph/(Pb/1000)):0,Pa:Pa,Pr:Pr,Pt:Pt,Ph:Ph,Ps:Ps,Pw:Pw,be:be,mass:mass,Crr:Crr};
+}
+
+// ================================================================
+// SCENARIO PRESETS
+// ================================================================
+var PRESETS={
+  deep_winter:  {af:5,  cf:72,wind:5, seat:true, whl:true, psi:40,label:'Deep winter (-15°C / 5°F)'},
+  mild_winter:  {af:30, cf:72,wind:3, seat:true, whl:false,psi:41,label:'Mild winter (0°C / 32°F)'},
+  spring_fall:  {af:50, cf:72,wind:0, seat:false,whl:false,psi:42,label:'Spring/Fall (10°C / 50°F)'},
+  summer:       {af:72, cf:72,wind:0, seat:false,whl:false,psi:42,label:'Summer (22°C / 72°F)'},
+  hot_summer:   {af:95, cf:72,wind:0, seat:false,whl:false,psi:42,label:'Hot summer (35°C / 95°F)'},
+};
+var TRAFFIC_MAP={city:'stopgo',highway:'cruise',mixed:'mixed'};
+var SPEED_MAP={city:40,highway:65,mixed:55};
+
+// ================================================================
+// STATE
+// ================================================================
+var SEL={1:null,2:null,3:null};
+
+function pick(btn){
+  var q=+btn.dataset.q, v=btn.dataset.v;
+  SEL[q]=v;
+  document.querySelectorAll('[data-q="'+q+'"]').forEach(function(b){b.classList.remove('sel');});
+  btn.classList.add('sel');
+  checkReady();
+}
+
+function checkReady(){
+  var btn=document.getElementById('calc-btn');
+  if(SEL[1]&&SEL[2]&&SEL[3]){btn.classList.add('ready');}
+  else{btn.classList.remove('ready');}
+}
+
+// ================================================================
+// NAVIGATION
+// ================================================================
+function goHome(){
+  document.getElementById('landing').style.display='flex';
+  document.getElementById('guided').style.display='none';
+  document.getElementById('result').style.display='none';
+  window.scrollTo(0,0);
+}
+function goGuided(){
+  document.getElementById('landing').style.display='none';
+  document.getElementById('guided').style.display='block';
+  document.getElementById('result').style.display='none';
+  window.scrollTo(0,0);
+}
+
+function goAdvanced(){
+  window.location.href = 'calculator.html';
+}
+
+
+// ================================================================
+// WATERFALL CALCULATION
+// ================================================================
+function buildWaterfall(season, driveType, dk){
+  var preset=PRESETS[season];
+  var traffic=TRAFFIC_MAP[driveType];
+  var mph=SPEED_MAP[driveType];
+  var cfg=CFG[dk==='unsure'?'fwd':dk];
+  var actualDk=dk==='unsure'?'fwd':dk;
+
+  // Perfect base: 70°F, cruise, 65mph, no accessories
+  var base=calcEff(65,70,actualDk,72,false,false,false,0,1,42,'cruise');
+  var baseRangeKm=Math.round(base.eff*cfg.pack*1.60934);
+
+  // Actual conditions
+  var actual=calcEff(mph,preset.af,actualDk,preset.cf,preset.seat,preset.whl,false,preset.wind,1,preset.psi,traffic);
+  var actualRangeKm=Math.round(actual.eff*cfg.pack*1.60934);
+
+  // --- Build loss components ---
+  // We isolate each effect by toggling one variable at a time from base
+  var r={}; // intermediate results
+
+  // 1. Temperature effect on battery (bEta loss)
+  var bEtaLoss=base.eff*(1-actual.be/base.be);
+  var bEtaKm=Math.round(bEtaLoss*cfg.pack*1.60934);
+
+  // 2. HVAC (heating or cooling)
+  var hvacEff=calcEff(mph,preset.af,actualDk,preset.cf,false,false,false,0,1,42,'cruise');
+  var hvacOnlyEff=calcEff(mph,70,actualDk,70,false,false,false,0,1,42,'cruise'); // no hvac
+  var hvacLoss=hvacEff.eff-hvacOnlyEff.eff; // negative = loss
+  var hvacKm=Math.abs(Math.round(hvacLoss*cfg.pack*1.60934));
+  var isHeating=preset.cf>preset.af+2;
+  var isCooling=preset.af>preset.cf+2;
+
+  // 3. Speed effect (65mph base vs actual mph)
+  var speedEff=calcEff(mph,70,actualDk,72,false,false,false,0,1,42,'cruise');
+  var speedBase=calcEff(65,70,actualDk,72,false,false,false,0,1,42,'cruise');
+  var speedLoss=speedBase.eff-speedEff.eff;
+  var speedKm=Math.round(speedLoss*cfg.pack*1.60934);
+
+  // 4. Traffic / stop-go
+  var trafficEff=calcEff(mph,preset.af,actualDk,preset.cf,false,false,false,0,1,42,traffic);
+  var noTrafficEff=calcEff(mph,preset.af,actualDk,preset.cf,false,false,false,0,1,42,'cruise');
+  var trafficLoss=noTrafficEff.eff-trafficEff.eff;
+  var trafficKm=Math.round(trafficLoss*cfg.pack*1.60934);
+
+  // 5. Seat heaters if on
+  var seatKm=preset.seat?Math.round((140/1000)/actual.eff*cfg.pack*1.60934*0.15):0;
+
+  // Recalculate actual to make sure bars sum correctly
+  // Use actual range and distribute proportionally
+  var totalLossKm=baseRangeKm-actualRangeKm;
+  var rawTotal=bEtaKm+hvacKm+Math.max(0,speedKm)+Math.max(0,trafficKm)+seatKm;
+
+  // Scale losses to match actual total (physics rounding)
+  var scale=rawTotal>0?totalLossKm/rawTotal:1;
+  bEtaKm=Math.round(bEtaKm*scale);
+  hvacKm=Math.round(hvacKm*scale);
+  speedKm=Math.round(Math.max(0,speedKm)*scale);
+  trafficKm=Math.round(Math.max(0,trafficKm)*scale);
+  seatKm=Math.round(seatKm*scale);
+
+  // Build bars array
+  var bars=[];
+  bars.push({
+    label:'Max Range',
+    km:baseRangeKm,
+    isAnchor:true,anchorType:'start',
+    color:'#3b9eff',
+    emoji:'⚡',
+    tip:{title:'⚡ Maximum Rated Range',km_val:baseRangeKm,mi_val:Math.round(baseRangeKm/1.60934),
+      body:'This is your Equinox EV\'s ideal range — 65 mph, 21°C, no heating or cooling, perfect battery temperature. Think of this as your ceiling on a perfect day.'}
+  });
+
+  if(bEtaKm>2){
+    bars.push({
+      label:'Cold battery',km:bEtaKm,isLoss:true,
+      color:'#a78bfa',emoji:'🔋',
+      tip:{title:'🔋 Cold Battery Loss',km:'-'+bEtaKm+' km',
+        body:'Lithium batteries are less efficient in cold weather. Internal resistance rises, meaning more energy is wasted as heat inside the cells just moving electricity around. This is physics — it happens in every EV and every phone battery in winter.'}
+    });
+  }
+
+  if(hvacKm>2&&isHeating){
+    bars.push({
+      label:'Cabin heating',km:hvacKm,isLoss:true,
+      color:'#ff8c42',emoji:'🌡️',
+      tip:{title:'🌡️ Cabin Heating',km:'-'+hvacKm+' km',
+        body:'Your heat pump is working hard to warm the cabin from '+Math.round((preset.af-32)*5/9)+'°C to '+Math.round((preset.cf-32)*5/9)+'°C. Below about -10°C it switches to resistive heating (like a toaster) which is 2–3× less efficient than the heat pump. This is often the single biggest range drain in winter.'}
+    });
+  }
+  if(hvacKm>2&&isCooling){
+    bars.push({
+      label:'Air conditioning',km:hvacKm,isLoss:true,
+      color:'#ff8c42',emoji:'❄️',
+      tip:{title:'❄️ Air Conditioning',km:'-'+hvacKm+' km',
+        body:'Cooling the cabin from '+Math.round((preset.af-32)*5/9)+'°C down to '+Math.round((preset.cf-32)*5/9)+'°C uses your A/C compressor. Hot weather A/C can draw 1–2 kW continuously — significant but less than winter heating.'}
+    });
+  }
+
+  if(speedKm>2){
+    bars.push({
+      label:'Speed drag',km:speedKm,isLoss:true,
+      color:'#fbbf24',emoji:'💨',
+      tip:{title:'💨 Aerodynamic Drag',km:'-'+speedKm+' km',
+        body:'Air resistance grows with the cube of speed. Going from 65 mph to your current speed changes aero drag significantly. Highway driving at higher speeds is the most common reason real-world range falls below the rated figure.'}
+    });
+  }
+
+  if(trafficKm>2){
+    bars.push({
+      label:'Stop & go',km:trafficKm,isLoss:true,
+      color:'#f87171',emoji:'🚦',
+      tip:{title:'🚦 Stop-and-Go Traffic',km:'-'+trafficKm+' km',
+        body:'In stop-and-go traffic your HVAC system costs more per km because you\'re covering less distance per minute while still heating or cooling the cabin. Regenerative braking recovers some energy but not all. City driving is harder on range than steady highway for an EV in cold weather.'}
+    });
+  }
+
+  if(seatKm>2){
+    bars.push({
+      label:'Seat heaters',km:seatKm,isLoss:true,
+      color:'#34d399',emoji:'🪑',
+      tip:{title:'🪑 Seat & Wheel Heaters',km:'-'+seatKm+' km',
+        body:'Seat heaters draw about 140W — modest compared to cabin heating, but continuous. The trick: seat heaters warm you directly, so you can often lower the cabin temperature setpoint and save more than the seat heaters cost. Net effect can actually be positive in mild cold.'}
+    });
+  }
+
+  bars.push({
+    label:'Your range today',
+    km:actualRangeKm,
+    isAnchor:true,anchorType:'end',
+    color:'#39d98a',emoji:'🏁',
+    tip:{title:'🏁 Your Range Today',km:actualRangeKm+' km',
+      body:'This is your estimated real range under today\'s conditions. Nothing is wrong with your car — this is exactly what physics predicts. As temperatures rise and trips get longer, your range will improve.'}
+  });
+
+  return{bars:bars,baseKm:baseRangeKm,actualKm:actualRangeKm,preset:preset,dk:actualDk,cfg:cfg,traffic:traffic};
+}
+
+// ================================================================
+// WATERFALL CHART DRAW
+// ================================================================
+var WF_DATA=null;
+var WF_ZONES=[];
+
+function drawWaterfall(data){
+  var canvas=document.getElementById('wf');
+  var wrap=document.getElementById('wf-canvas-wrap');
+  var W=wrap.clientWidth||700;
+  var dpr=window.devicePixelRatio||1;
+  var H=Math.max(300,Math.min(460,Math.round(W*0.58)));
+  canvas.width=W*dpr;canvas.height=H*dpr;
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
+  var ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+
+  var PL=58,PR=24,PT=40,PB=64;
+  var cw=W-PL-PR,ch=H-PT-PB;
+  var bars=data.bars;
+  var n=bars.length;
+  var slotW=cw/n,bw=slotW*0.62,gap=(slotW-bw)/2;
+
+  var maxVal=data.baseKm;
+  var scY=ch/maxVal;
+
+  WF_ZONES=[];
+
+  ctx.fillStyle='#060f1e';ctx.fillRect(0,0,W,H);
+
+  // Grid lines
+  var gridStep=50;
+  ctx.strokeStyle='rgba(255,255,255,0.04)';ctx.lineWidth=1;ctx.setLineDash([3,4]);
+  for(var gv=0;gv<=maxVal;gv+=gridStep){
+    var gy=PT+ch-gv*scY;
+    ctx.beginPath();ctx.moveTo(PL,gy);ctx.lineTo(PL+cw,gy);ctx.stroke();
+    if(gv%100===0){
+      ctx.setLineDash([]);
+      ctx.fillStyle='rgba(120,160,200,0.5)';ctx.font='10px "DM Mono",monospace';ctx.textAlign='right';
+      var gvDisp=METRIC?gv:Math.round(gv/1.60934);
+      ctx.fillText(gvDisp,PL-8,gy+4);
+      ctx.setLineDash([3,4]);
+    }
+  }
+  ctx.setLineDash([]);
+
+  // Y axis label
+  ctx.save();ctx.translate(14,PT+ch/2);ctx.rotate(-Math.PI/2);
+  ctx.fillStyle='rgba(100,140,180,0.6)';ctx.font='10px "Space Grotesk",sans-serif';ctx.textAlign='center';
+  ctx.fillText(METRIC?'Range (km)':'Range (mi)',0,0);ctx.restore();
+
+  // Running position for waterfall
+  var runTop=data.baseKm; // current top of the stack (in km units)
+
+  for(var i=0;i<n;i++){
+    var bar=bars[i];
+    var x=PL+i*slotW+gap;
+    var bh,by;
+
+    if(bar.isAnchor){
+      // Anchor bars sit on baseline
+      bh=bar.km*scY;
+      by=PT+ch-bh;
+    } else {
+      // Floating loss bar: starts at runTop, goes down by bar.km
+      bh=bar.km*scY;
+      by=PT+ch-runTop*scY;
+      runTop-=bar.km;
+    }
+
+    // Clamp
+    bh=Math.max(2,bh);
+
+    // Draw bar with gradient
+    var grad=ctx.createLinearGradient(x,by,x,by+bh);
+    grad.addColorStop(0,bar.color+'ff');
+    grad.addColorStop(1,bar.color+'88');
+    ctx.fillStyle=grad;
+
+    // Rounded top corners
+    var r=5;
+    ctx.beginPath();
+    ctx.moveTo(x+r,by);
+    ctx.lineTo(x+bw-r,by);
+    ctx.arcTo(x+bw,by,x+bw,by+r,r);
+    ctx.lineTo(x+bw,by+bh);
+    ctx.lineTo(x,by+bh);
+    ctx.lineTo(x,by+r);
+    ctx.arcTo(x,by,x+r,by,r);
+    ctx.closePath();
+    ctx.fill();
+
+    // Subtle border
+    ctx.strokeStyle=bar.color+'55';ctx.lineWidth=1;ctx.stroke();
+
+    // Glow effect for anchor bars
+    if(bar.isAnchor){
+      ctx.shadowColor=bar.color;ctx.shadowBlur=20;
+      ctx.fill();ctx.shadowBlur=0;
+    }
+
+    // Connector line to next bar (for loss bars)
+    if(!bar.isAnchor&&i<n-1&&!bars[i+1].isAnchor){
+      var nextX=PL+(i+1)*slotW+gap;
+      ctx.strokeStyle='rgba(255,255,255,0.12)';ctx.lineWidth=1;ctx.setLineDash([4,3]);
+      ctx.beginPath();ctx.moveTo(x+bw,by+bh);ctx.lineTo(nextX,by+bh);ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    // Value label on bar
+    var labelY=by-8;
+    ctx.fillStyle='#fff';ctx.font='bold 11px "DM Mono",monospace';ctx.textAlign='center';
+    var labelTxt=(bar.isLoss?'-':'')+(METRIC?bar.km:Math.round(bar.km/1.60934))+(METRIC?' km':' mi');
+    ctx.fillText(labelTxt,x+bw/2,labelY);
+
+    // Emoji
+    ctx.font='16px serif';ctx.textAlign='center';
+    ctx.fillText(bar.emoji,x+bw/2,by+bh/2+(bh>30?8:4));
+
+    // X label
+    ctx.fillStyle='rgba(120,160,200,0.7)';ctx.font='10px "Space Grotesk",sans-serif';ctx.textAlign='center';
+    var lw=bw+4;
+    ctx.save();
+    // Clip label to reasonable width
+    var words=bar.label.split(' ');
+    var line1=words[0],line2=words.slice(1).join(' ');
+    ctx.fillText(line1,x+bw/2,PT+ch+18);
+    if(line2)ctx.fillText(line2,x+bw/2,PT+ch+30);
+    ctx.restore();
+
+    // Store zone for hover
+    WF_ZONES.push({x:x,y:by,w:bw,h:bh,bar:bar});
+  }
+
+  // Baseline
+  ctx.strokeStyle='rgba(59,158,255,0.2)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(PL,PT+ch);ctx.lineTo(PL+cw,PT+ch);ctx.stroke();
+}
+
+// ================================================================
+// TOOLTIP
+// ================================================================
+var wfCanvas=null;
+function initTooltip(){
+  wfCanvas=document.getElementById('wf');
+  var tip=document.getElementById('wf-tip');
+
+  // Track which bar is currently pinned open
+  var pinnedZone = null;
+
+  function showTip(hit, ev, r){
+    var tipKmVal = hit.bar.tip.km || '';
+    var tipRaw = tipKmVal.replace(/[^0-9]/g,'');
+    var tipSign = tipKmVal.charAt(0)==='-'?'-':tipKmVal.charAt(0)==='+'?'+':'';
+    if(tipRaw && !METRIC){
+      tipKmVal = tipSign+Math.round(parseInt(tipRaw)/1.60934)+' mi';
+    } else if(tipRaw && METRIC){
+      tipKmVal = tipSign+tipRaw+' km';
+    }
+    document.getElementById('tip-title').textContent = hit.bar.tip.title;
+    document.getElementById('tip-km').textContent = tipKmVal;
+    document.getElementById('tip-km').style.color = hit.bar.color;
+    document.getElementById('tip-body').textContent = hit.bar.tip.body;
+    tip.style.display = 'block';
+    if(ev && r){
+      var tx = ev.clientX - r.left + 16;
+      if(tx + 290 > r.width) tx = ev.clientX - r.left - 295;
+      tip.style.left = Math.max(4,tx) + 'px';
+      tip.style.top = Math.max(4, ev.clientY - r.top - 60) + 'px';
+    }
+    // Add close hint if not already there
+    if(!document.getElementById('tip-close')){
+      var closeRow = document.createElement('div');
+      closeRow.id = 'tip-close';
+      closeRow.style.cssText = 'margin-top:10px;text-align:right;font-size:10px;color:#3d6080;font-family:var(--body);';
+      closeRow.textContent = 'click again to close';
+      tip.appendChild(closeRow);
+    }
+  }
+
+  function hideTip(){
+    tip.style.display = 'none';
+    pinnedZone = null;
+  }
+
+  // HOVER — preview only when nothing is pinned
+  wfCanvas.addEventListener('mousemove', function(ev){
+    if(pinnedZone) return;
+    var r = wfCanvas.getBoundingClientRect();
+    var mx = ev.clientX - r.left, my = ev.clientY - r.top;
+    var hit = null;
+    WF_ZONES.forEach(function(z){
+      if(mx>=z.x&&mx<=z.x+z.w&&my>=z.y&&my<=z.y+z.h) hit=z;
+    });
+    if(hit){
+      showTip(hit, ev, r);
+      wfCanvas.style.cursor = 'pointer';
+    } else {
+      tip.style.display = 'none';
+      wfCanvas.style.cursor = 'default';
+    }
+  });
+
+  // MOUSE LEAVE — only hide if nothing pinned
+  wfCanvas.addEventListener('mouseleave', function(){
+    if(!pinnedZone) tip.style.display = 'none';
+  });
+
+  // CLICK — first click pins open, second click or click on empty area closes
+  wfCanvas.addEventListener('click', function(ev){
+    var r = wfCanvas.getBoundingClientRect();
+    var mx = ev.clientX - r.left, my = ev.clientY - r.top;
+    var hit = null;
+    WF_ZONES.forEach(function(z){
+      if(mx>=z.x&&mx<=z.x+z.w&&my>=z.y&&my<=z.y+z.h) hit=z;
+    });
+    if(hit){
+      if(pinnedZone === hit){
+        hideTip(); // second click on same bar — close
+      } else {
+        pinnedZone = hit; // pin this bar open
+        showTip(hit, ev, r);
+      }
+    } else {
+      if(pinnedZone) hideTip(); // clicked empty space — close
+    }
+  });
+
+  // TOUCH — tap to pin, tap same bar or elsewhere to close
+  wfCanvas.addEventListener('touchstart', function(ev){
+    var r = wfCanvas.getBoundingClientRect();
+    var t = ev.touches[0];
+    var mx = t.clientX - r.left, my = t.clientY - r.top;
+    var hit = null;
+    WF_ZONES.forEach(function(z){
+      if(mx>=z.x&&mx<=z.x+z.w&&my>=z.y&&my<=z.y+z.h) hit=z;
+    });
+    if(hit){
+      ev.preventDefault();
+      if(pinnedZone === hit){
+        hideTip();
+      } else {
+        pinnedZone = hit;
+        showTip(hit, null, null);
+        // Centre tooltip on mobile
+        tip.style.left = Math.max(4, r.width/2 - 140) + 'px';
+        tip.style.top = '44px';
+      }
+    } else {
+      if(pinnedZone) hideTip();
+    }
+  },{passive:false});
+}
+
+// ================================================================
+// LEGEND
+// ================================================================
+function buildLegend(bars){
+  var leg=document.getElementById('wf-legend');
+  leg.innerHTML='';
+  bars.forEach(function(b){
+    var d=document.createElement('div');d.className='wf-leg';
+    var dot=document.createElement('div');dot.className='wf-leg-dot';dot.style.background=b.color;
+    var lbl=document.createElement('span');lbl.textContent=b.emoji+' '+b.label;
+    d.appendChild(dot);d.appendChild(lbl);leg.appendChild(d);
+  });
+}
+
+// ================================================================
+// PLAIN ENGLISH SUMMARY
+// ================================================================
+function buildPlainText(data){
+  var lost=data.baseKm-data.actualKm;
+  var pct=Math.round(lost/data.baseKm*100);
+  var season=SEL[1],drive=SEL[2];
+
+  var hvacBar=data.bars.filter(function(b){return b.label==='Cabin heating'||b.label==='Air conditioning';})[0];
+  var batBar=data.bars.filter(function(b){return b.label==='Cold battery';})[0];
+  var trafficBar=data.bars.filter(function(b){return b.label==='Stop & go';})[0];
+
+  var hvacKm=hvacBar?hvacBar.km:0;
+  var batKm=batBar?batBar.km:0;
+  var trafficKm=trafficBar?trafficBar.km:0;
+
+  var biggest=data.bars.filter(function(b){return b.isLoss;}).sort(function(a,b){return b.km-a.km;})[0];
+
+  var seasonal='';
+  if(season==='deep_winter'||season==='mild_winter'){
+    seasonal='Winter is the hardest season for any EV. Cold temperatures affect both the battery chemistry and force the heating system to work continuously.';
+  } else if(season==='hot_summer'){
+    seasonal='Hot weather A/C and slightly reduced battery efficiency combine for a modest range impact — much less severe than winter.';
+  } else {
+    seasonal='These are near-ideal driving conditions. Your range is close to the rated figure.';
+  }
+
+  var actualDisp=dDisp(data.actualKm), baseDisp=dDisp(data.baseKm), lostDisp=dDisp(lost);
+  var html='Your Equinox EV is showing <strong>'+actualDisp+'</strong> today instead of the rated <strong>'+baseDisp+'</strong> — a difference of <strong>'+lostDisp+' ('+pct+'%)</strong>. ';
+  if(biggest){
+    html+='The biggest factor is <span class="highlight">'+biggest.emoji+' '+biggest.label+' ('+dDisp(biggest.km)+')</span>. ';
+  }
+  html+=seasonal;
+  if(hvacKm>20){
+    html+=' <strong>Nothing is wrong with your car</strong> — this is exactly what the physics predicts for these conditions.';
+  }
+
+  document.getElementById('plain-text').innerHTML=html;
+}
+
+// ================================================================
+// SHOW RESULT
+// ================================================================
+function showResult(){
+  if(!SEL[1]||!SEL[2]||!SEL[3])return;
+
+  var data=buildWaterfall(SEL[1],SEL[2],SEL[3]);
+  WF_DATA=data;
+
+  // Update header
+  var seasonLabel=PRESETS[SEL[1]].label;
+  document.getElementById('result-title').textContent='Here\'s where your range went';
+  document.getElementById('result-sub').textContent=
+    seasonLabel+' · '+(SEL[2]==='city'?'City driving':SEL[2]==='highway'?'Highway':'Mixed driving')+
+    ' · '+(data.dk==='fwd'?'FWD Single Motor':'AWD Dual Motor')+
+    ' · '+(METRIC?'Kilometres':'Miles');
+
+  document.getElementById('guided').style.display='none';
+  document.getElementById('result').style.display='block';
+  window.scrollTo(0,0);
+
+  // Draw after DOM settles
+  setTimeout(function(){
+    drawWaterfall(data);
+    buildLegend(data.bars);
+    buildPlainText(data);
+    initTooltip();
+
+    // Redraw on resize
+    var ro=new ResizeObserver(function(){drawWaterfall(WF_DATA);});
+    ro.observe(document.getElementById('wf-canvas-wrap'));
+  },80);
+}
+
+// Animate bars in on draw
+// (The draw function runs immediately; animation is handled via requestAnimationFrame)
+(function animateWaterfall(){
+  var progress=0,targetData=null;
+  window._animateWF=function(data){
+    targetData=data;progress=0;
+    function frame(){
+      progress=Math.min(1,progress+0.035);
+      // draw with progress scale on bar heights
+      drawWaterfallAnimated(data,progress);
+      if(progress<1)requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  };
+})();
+
+// Init unit toggle default
+document.getElementById('ut-km').classList.add('active');
+
+function drawWaterfallAnimated(data,p){
+  // scale each bar height by p (ease out)
+  var ep=1-Math.pow(1-p,3);
+  var animData=JSON.parse(JSON.stringify(data));
+  animData.bars=animData.bars.map(function(b){return Object.assign({},b,{km:Math.round(b.km*ep)});});
+  drawWaterfall(animData);
+}
+
+// Override showResult to use animation
+var _origShowResult=showResult;
+showResult=function(){
+  if(!SEL[1]||!SEL[2]||!SEL[3])return;
+  var data=buildWaterfall(SEL[1],SEL[2],SEL[3]);
+  WF_DATA=data;
+  document.getElementById('result-title').textContent='Here\'s where your range went';
+  var seasonLabel=PRESETS[SEL[1]].label;
+  document.getElementById('result-sub').textContent=
+    seasonLabel+' · '+(SEL[2]==='city'?'City driving':SEL[2]==='highway'?'Highway':'Mixed driving')+
+    ' · '+(data.dk==='fwd'?'FWD Single Motor':'AWD Dual Motor');
+  document.getElementById('guided').style.display='none';
+  document.getElementById('result').style.display='block';
+  window.scrollTo(0,0);
+  setTimeout(function(){
+    buildLegend(data.bars);
+    buildPlainText(data);
+    initTooltip();
+    window._animateWF(data);
+    var ro=new ResizeObserver(function(){drawWaterfall(WF_DATA);});
+    ro.observe(document.getElementById('wf-canvas-wrap'));
+  },80);
+};
+</script>
+</body>
+</html>
