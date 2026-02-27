@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><!-- v20260226-V4.5 -->
+<html lang="en"><!-- v20260226-V4.6 -->
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
@@ -108,7 +108,7 @@ canvas{display:block;border-radius:8px}
 .adv-toggle-icon{font-size:14px}
 .adv-toggle-text{font-size:12px;font-weight:700;color:#94a3b8}
 .adv-toggle-sub{font-size:10px;color:var(--text-muted);margin-top:1px}
-.adv-chevron{font-size:14px;color:orange;transition:transform .3s}
+.adv-chevron{font-size:14px;color:var(--text-muted);transition:transform .3s}
 .adv-chevron.open{transform:rotate(180deg)}
 .adv-body{max-height:0;overflow:hidden;transition:max-height .45s cubic-bezier(.4,0,.2,1)}
 .adv-body.open{max-height:1200px}
@@ -164,7 +164,7 @@ pre{font-size:10px;line-height:1.6;white-space:pre-wrap;background:#020617;borde
 // ================================================================
 var CFG={
   fwd:{label:"FWD Single Motor",eta:0.882,massAdd:0,  pack:79,epa_mi:319,mpge:108,awd:false},
-  awd:{label:"AWD Dual Motor",  eta:0.848,massAdd:68, pack:79,epa_mi:307,mpge:103,awd:true}
+  awd:{label:"AWD Dual Motor",  eta:0.848,massAdd:68, pack:79,epa_mi:307,mpge:96, awd:true}
 };
 var BM=2041,BCD=0.29,BA=2.60,BCR=0.009,GG=9.81,PACC=400,UA=160,AWD_CRR=0.0004;
 
@@ -345,7 +345,7 @@ function dWind(mph){
   return ST.metric?(mph>0?"+":"")+Math.round(mToK(mph))+" km/h":(mph>0?"+"+mph+" mph headwind":Math.abs(mph)+" mph tailwind");
 }
 function dGrade(g){return g===0?"Level":g>0?"+"+g+"% uphill":g+"% downhill";}
-function epaEff(dk){var c=CFG[dk];var b=c.epa_mi/c.pack;return ST.metric?b*1.60934:b;}
+function epaEff(dk){var c=CFG[dk];var b=c.mpge/33.705;return ST.metric?b*1.60934:b;}
 
 // ================================================================
 // STATE
@@ -995,10 +995,10 @@ function buildApp(){
   var topbar=el('div',{class:'topbar'});
   topbar.appendChild(el('span',{style:{fontSize:'10px',color:'#64748b',fontWeight:'700',marginRight:'2px'}},'DRIVETRAIN:'));
   fwdBtn=el('button',{class:'dt-btn dt-fwd'});
-  fwdBtn.innerHTML="⚡ FWD <span style='font-size:9px;opacity:.75'>Single Motor 108 MPGe 319mi</span>";
+  fwdBtn.innerHTML="⚡ FWD <span style='font-size:9px;opacity:.75'>Single Motor 108 MPGe · 319mi EPA</span>";
   fwdBtn.addEventListener('click',function(){ST.dt='fwd';track('drivetrain_click','fwd');updDT();recomputeAndAnimate();});
   awdBtn=el('button',{class:'dt-btn dt-off'});
-  awdBtn.innerHTML="⚡⚡ AWD <span style='font-size:9px;opacity:.75'>Dual Motor 103 MPGe 307mi</span>";
+  awdBtn.innerHTML="⚡⚡ AWD <span style='font-size:9px;opacity:.75'>Dual Motor 96 MPGe 307mi</span>";
   awdBtn.addEventListener('click',function(){ST.dt='awd';track('drivetrain_click','awd');updDT();recomputeAndAnimate();});
   topbar.appendChild(fwdBtn);topbar.appendChild(awdBtn);
   topbar.appendChild(el('div',{class:'sep'}));
@@ -1097,7 +1097,7 @@ function buildApp(){
 
   // ── FOOTER ──
   app.appendChild(el('div',{style:{marginTop:'10px',textAlign:'center',fontSize:'9px',color:'#90EE90',paddingBottom:'14px'}},
-    'Equinox EV Efficiency Model | Physics-based educational tool | 2024–2026 |Not affiliated with GM |created by gazunni'),el('div',{style:{marginTop:'5px',fontSize:'8px',color:'#334155',maxWidth:'700px',margin:'5px auto 0',lineHeight:'1.6',textAlign:'center'}},
+    'Equinox EV Efficiency Model | Physics-based educational tool | 2024–2026 | created by gazunni'),el('div',{style:{marginTop:'5px',fontSize:'8px',color:'#334155',maxWidth:'700px',margin:'5px auto 0',lineHeight:'1.6',textAlign:'center'}},
     'Physics-based educational tool. Results are modelled estimates for informational purposes only — not for trip planning or safety-critical decisions. Real-world range varies with driving behaviour, vehicle condition, and factors not captured in this model. Not affiliated with or endorsed by General Motors Corporation.'));
 
   updDT();updateEpaLabel();
@@ -1136,7 +1136,7 @@ function updDT(){
 
 function updateEpaLabel(){
   var ep=$id('epa-el');
-  if(ep){var c=CFG[ST.dt];ep.textContent=c.label+' | EPA '+c.epa_mi+' mi | '+c.mpge+' MPGe | estimates only';}
+  if(ep){var c=CFG[ST.dt];var weff=(c.mpge/33.705);var weffD=ST.metric?(weff*1.60934).toFixed(3):weff.toFixed(3);ep.textContent=c.label+' | EPA '+c.epa_mi+' mi | '+c.mpge+' MPGe | '+weffD+' '+dUnit()+' wall-to-wheels';}
 }
 
 // ================================================================
@@ -1369,9 +1369,9 @@ function bChart(){
     if(ez&&mx>=ez.x&&mx<=ez.x+ez.w&&my>=ez.y&&my<=ez.y+ez.h){
       chartTip.innerHTML='<b style="color:#facc15">&#128202; EPA Reference Line</b><br><br>'+
         '<span style="color:#94a3b8">GM combined rating: </span><b style="color:#facc15">'+ez.epa.toFixed(2)+' '+dUnit()+'</b><br><br>'+
-        '<span style="color:#cbd5e1">The EPA number reflects a standardized city/highway test cycle \u2014 varying speeds, stop-and-go, cold starts and accessory loads averaged together.</span><br><br>'+
-        '<span style="color:#cbd5e1">This app shows efficiency at a <b style="color:#fff">specific operating point</b> \u2014 one speed, one temperature, one set of conditions. Steady highway cruising in mild weather naturally exceeds the combined rating, just as a car\'s highway MPG exceeds its combined MPG.</span><br><br>'+
-        '<span style="color:#90EE90">Both numbers are correct \u2014 they measure different things.</span>';
+        '<span style="color:#cbd5e1">The EPA figure is a <b style="color:#fff">wall-to-wheels</b> measurement — energy drawn from your L2 charger, including charging losses (~20%). It reflects a standardized city/highway test cycle averaged together.</span><br><br>'+
+        '<span style="color:#cbd5e1">This app models efficiency at a <b style="color:#fff">specific operating point</b> — one speed, one temperature, one set of conditions. Steady highway cruising in mild weather will exceed the combined EPA rating, just as ICE highway MPG exceeds combined MPG.</span><br><br>'+
+        '<span style="color:#90EE90">The EPA line here uses the official wall-side figure (MPGe ÷ 33.705). Bars above the line beat EPA under those conditions.</span>';
       chartTip.style.display='block';chartTip.style.maxWidth='280px';chartTip.style.lineHeight='1.7';
       var tx=ez.x+ez.w+8;if(tx+290>r.width)tx=ez.x-295;
       chartTip.style.left=tx+'px';chartTip.style.top=Math.max(4,ez.y-40)+'px';
@@ -1561,7 +1561,7 @@ function bModel(){
   var pg=el('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:'6px',marginBottom:'10px'}});
   [['⚖️ Base mass (FWD)','2041 kg (4499 lb)'],['⚖️ AWD extra mass','+68 kg (motor+diff)'],
    ['💨 Drag coefficient Cd','0.29 | +0.10 roof box'],['📐 Frontal area A','2.60 m² | +0.25 roof box'],
-   ['⚡ FWD drivetrain eta','88.2% (EPA 108 MPGe)'],['⚡⚡ AWD drivetrain eta','84.8% (EPA 103 MPGe)'],
+   ['⚡ FWD drivetrain eta','88.2% (EPA 108 MPGe)'],['⚡⚡ AWD drivetrain eta','84.8% (EPA 96 MPGe = 2.848 mi/kWh wall)'],
    ['⚙️ AWD rear bearing drag','Crr +0.0004 equiv.'],['🛞 Rolling resistance Crr','0.009 @42 PSI nominal'],
    ['🛞 Crr pressure sensitivity','+0.00015 per PSI under 36'],['🌡️ Cabin heat transfer UA','160 W/°F'],
    ['🔥 Heat pump COP @0°F','1.0 (full PTC resistive)'],['🔥 Heat pump COP @20°F','1.55'],
@@ -1569,7 +1569,8 @@ function bModel(){
    ['☀️ Solar gain full sun','500W thermal through glass'],['👤 Occupant metabolic heat','100W per person (AC)'],
    ['🔋 Battery eta @60°F+','1.000'],['🔋 Battery eta @40°F','0.975'],
    ['🔋 Battery eta @20°F','0.945'],['🔋 Battery eta @5°F','0.905'],
-   ['🔋 Battery eta @0°F','0.875'],['🔋 Usable pack','79 kWh'],
+   ['🔋 Battery eta @0°F','0.875'],['🔋 Usable pack','79 kWh (GM rated) — real-world new vehicle ~89–90 kWh reported'],
+   ['📊 EPA efficiency basis','Wall-to-wheels (MPGe÷33.705): FWD=3.204 mi/kWh | AWD=2.848 mi/kWh'],
    ['🔌 Base accessories','400W (12V, lights, ctrl)'],['🪑 Seat heaters x2','140W resistive'],
    ['🎡 Steering wheel heater','25W resistive'],['🪟 Rear defrost+mirrors','~250W resistive'],
    ['🔋 Base case definition','70°F · calm · solo · 42PSI · cruise · 100% SOH'],
