@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"><!-- equinox-landing-v1.2 -->
+<html lang="en"><!-- equinox-landing-v1.3 -->
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
@@ -260,7 +260,7 @@ canvas#wf{display:block;width:100%;border-radius:8px;}
       <span></span>Physics-based · 2024–2026 Chevrolet Equinox EV
     </div>
     <h1>The car tells you <span>what.</span><br>This tells you <span>why.</span></h1>
-    <p class="hero-sub">Your Equinox EV showed 320 km this morning. Now it says 190 km. Nothing is wrong with your car — but understanding <em>why</em> makes all the difference.</p>
+    <p class="hero-sub">Your Equinox EV showed 320 km this morning. Now it says 190 km. Nothing unusual is happening — but understanding <em>why</em> makes all the difference.</p>
   </div>
 
   <div class="branches">
@@ -269,7 +269,7 @@ canvas#wf{display:block;width:100%;border-radius:8px;}
       <span class="branch-icon">🔋</span>
       <span class="branch-tag">New owner · Quick answer</span>
       <h2>Why did my range change?</h2>
-      <p>Answer three simple questions. Get a clear, visual explanation of exactly where your range went — no jargon, no guesswork.</p>
+      <p>Answer three simple questions. Get a clear, visual physics-based estimate of where your range went — no jargon, plain English.</p>
       <div class="branch-features">
         <div class="bf">Takes under 60 seconds</div>
         <div class="bf">Plain English explanations</div>
@@ -357,7 +357,7 @@ canvas#wf{display:block;width:100%;border-radius:8px;}
   </div>
 
   <div class="waterfall-wrap">
-    <div class="wf-title">Range breakdown — km from full charge</div>
+    <div class="wf-title">Modelled range breakdown — km from full charge <span style='font-weight:400;color:#3d6080;font-size:10px'>(estimates only)</span></div>
     <div id="wf-canvas-wrap">
       <canvas id="wf"></canvas>
       <div class="wf-tip" id="wf-tip">
@@ -380,6 +380,7 @@ canvas#wf{display:block;width:100%;border-radius:8px;}
   </div>
 </section>
 
+<div style="text-align:center;padding:24px 20px 32px;font-size:9px;color:#1e3a5f;max-width:700px;margin:0 auto;line-height:1.7;">Physics-based educational tool. Results are modelled estimates only — not for trip planning or safety-critical decisions. Real-world range varies. Not affiliated with or endorsed by General Motors Corporation.</div>
 </div><!-- #root -->
 
 <script>
@@ -512,11 +513,11 @@ function goGuided(){
   document.getElementById('result').style.display='none';
   window.scrollTo(0,0);
 }
-  
 function goAdvanced(){
-  window.location.href = 'calculator.html';
+  // In production this would be: window.location.href='calculator.html';
+  // For demo, show a message
+  alert('This would open the full Equinox EV Physics Calculator.\n\nIn production, link this button to your existing index.html');
 }
-
 
 // ================================================================
 // WATERFALL CALCULATION
@@ -651,7 +652,7 @@ function buildWaterfall(season, driveType, dk){
     isAnchor:true,anchorType:'end',
     color:'#39d98a',emoji:'🏁',
     tip:{title:'🏁 Your Range Today',km:actualRangeKm+' km',
-      body:'This is your estimated real range under today\'s conditions. Nothing is wrong with your car — this is exactly what physics predicts. As temperatures rise and trips get longer, your range will improve.'}
+      body:'This is your modelled range estimate for today\'s conditions. This is normal and expected — physics models predict this outcome. Actual range varies with your specific driving. As temperatures improve, your range will too. <span style='color:#475569;font-size:13px'>These are modelled estimates — actual range varies with your specific driving conditions.</span>'}
   });
 
   return{bars:bars,baseKm:baseRangeKm,actualKm:actualRangeKm,preset:preset,dk:actualDk,cfg:cfg,traffic:traffic};
@@ -958,7 +959,7 @@ function buildPlainText(data){
   }
   html+=seasonal;
   if(hvacKm>20){
-    html+=' <strong>Nothing is wrong with your car</strong> — this is exactly what the physics predicts for these conditions.';
+    html+=' <strong>Nothing is wrong with your car</strong> — this is consistent with what physics models predict for these conditions.';
   }
 
   document.getElementById('plain-text').innerHTML=html;
