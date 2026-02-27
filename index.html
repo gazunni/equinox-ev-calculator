@@ -1,1611 +1,1054 @@
 <!DOCTYPE html>
-<html lang="en"><!-- v20260226-V4.6 -->
+<html lang="en"><!-- equinox-landing-v1.3 -->
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Equinox EV — Efficiency Calculator</title>
+<title>Equinox EV — Range Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@400;600;700;800&display=swap');
-
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;min-height:100%;background:#030712;font-family:'Outfit',ui-sans-serif,system-ui,sans-serif;color:#f1f5f9}
 :root{
-  --green:#90EE90;
-  --green-dim:rgba(144,238,144,0.15);
-  --blue:#3b82f6;
-  --slate:#1e293b;
-  --slate2:#0f172a;
-  --slate3:#334155;
-  --text-muted:#64748b;
-  --text-sub:#475569;
-  --mono:'DM Mono',ui-monospace,monospace;
+  --bg:#030b1a;
+  --bg2:#061224;
+  --card:#0a1628;
+  --border:#0f2240;
+  --border2:#1a3560;
+  --green:#39d98a;
+  --green-dim:rgba(57,217,138,0.12);
+  --blue:#3b9eff;
+  --blue-dim:rgba(59,158,255,0.12);
+  --orange:#ff8c42;
+  --purple:#a78bfa;
+  --yellow:#fbbf24;
+  --red:#f87171;
+  --text:#e8f4ff;
+  --text2:#7a9cc0;
+  --text3:#3d6080;
+  --mono:'DM Mono',monospace;
+  --head:'Syne',sans-serif;
+  --body:'Space Grotesk',sans-serif;
 }
-#app{max-width:1400px;margin:0 auto;padding:12px 14px}
+html,body{width:100%;min-height:100%;background:var(--bg);font-family:var(--body);color:var(--text);overflow-x:hidden}
 
-/* ── scrollbar ── */
-::-webkit-scrollbar{width:4px;height:4px}
-::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
-
-/* ── inputs ── */
-input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:9999px;outline:none;cursor:pointer;display:block}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid #1e293b;box-shadow:0 1px 4px rgba(0,0,0,.6);cursor:pointer;transition:transform .1s}
-input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2)}
-input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid #1e293b;cursor:pointer}
-
-/* ── cards ── */
-.card{background:var(--slate2);border:1px solid var(--slate);border-radius:12px;padding:14px;margin-bottom:10px}
-.mini{background:var(--slate);border-radius:7px;padding:8px;margin-bottom:6px}
-.mono{font-family:var(--mono)}
-
-/* ── buttons ── */
-button{cursor:pointer;border:none;font-family:'Outfit',sans-serif}
-.btn{padding:5px 12px;border-radius:5px;font-size:11px;font-weight:600;transition:background .12s}
-.bon{background:#2563eb;color:#fff}
-.boff{background:var(--slate);color:#94a3b8}
-.boff:hover{background:var(--slate3);color:#e2e8f0}
-
-/* ── top bar ── */
-.topbar{display:flex;align-items:center;gap:8px;background:var(--slate2);border:1px solid var(--slate);border-radius:10px;padding:9px 13px;margin-bottom:9px;flex-wrap:wrap}
-.sep{width:1px;height:26px;background:var(--slate);flex-shrink:0}
-.dt-btn{padding:7px 16px;border-radius:7px;font-size:12px;font-weight:700;transition:background .15s,color .15s}
-.dt-fwd{background:#2563eb;color:#fff}
-.dt-awd{background:#7c3aed;color:#fff}
-.dt-off{background:var(--slate);color:#64748b}
-.dt-off:hover{background:var(--slate3);color:#94a3b8}
-.unit-btn{padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700}
-
-/* ── scenario strip ── */
-.sc-wrap{background:var(--slate2);border:1px solid var(--slate);border-radius:12px;padding:12px 14px;margin-bottom:9px}
-.sc-title{font-size:10px;color:var(--green);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
-.sc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:0}
-.sc-btn{
-  background:var(--slate);border-radius:9px;padding:9px 8px;text-align:left;
-  border:1.5px solid transparent;transition:border-color .2s,background .2s,transform .1s;
-  cursor:pointer;position:relative;overflow:hidden;
+/* ── BACKGROUND ── */
+.bg-grid{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(rgba(59,158,255,0.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(59,158,255,0.03) 1px,transparent 1px);
+  background-size:60px 60px;
 }
-.sc-btn:hover{background:#1a2744;transform:translateY(-1px)}
-.sc-btn.active{background:#0f2040;border-color:#3b82f6;box-shadow:0 0 12px rgba(59,130,246,0.2)}
-.sc-btn.active::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#3b82f6,#90EE90)}
-.sc-icon{font-size:18px;margin-bottom:4px;display:block}
-.sc-name{font-size:11px;font-weight:700;color:#e2e8f0;display:block;line-height:1.2;margin-bottom:3px}
-.sc-sub{font-size:9px;color:var(--green);line-height:1.4;display:block}
-.sc-badge{position:absolute;top:7px;right:7px;font-size:8px;font-weight:700;padding:2px 5px;border-radius:3px;background:#166534;color:#86efac}
-.sc-badge.warm{background:#78350f;color:#fcd34d}
-.sc-badge.base{background:#1e3a5f;color:#93c5fd}
+.bg-glow{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(59,158,255,0.08),transparent),
+             radial-gradient(ellipse 40% 30% at 80% 60%,rgba(57,217,138,0.05),transparent);
+}
 
-/* ── temp slider panel (always visible) ── */
-.temp-panel{background:var(--slate2);border:1px solid var(--slate);border-radius:12px;padding:12px 14px;margin-bottom:9px}
-.temp-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.temp-label{font-size:11px;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
-.temp-value{font-family:var(--mono);font-size:24px;font-weight:500;color:#60a5fa;transition:color .3s}
-.temp-ticks{display:flex;justify-content:space-between;margin-top:5px}
-.temp-tick{font-size:8px;font-family:var(--mono);text-align:center;flex:1;min-width:0;transition:color .3s,font-weight .3s}
+/* ── LAYOUT ── */
+#root{position:relative;z-index:1;min-height:100vh;}
 
-/* ── chart card ── */
-.chart-card{background:var(--slate2);border:1px solid var(--slate);border-radius:12px;padding:14px;margin-bottom:9px}
-.chart-meta{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:10px}
-.chart-title{font-size:13px;font-weight:700;color:#e2e8f0}
-.chart-hint{font-size:10px;color:var(--text-sub);margin-top:2px}
-.chart-conditions{font-size:9px;color:var(--text-sub);text-align:right;line-height:1.9}
-.cwrap{position:relative;width:100%}
-canvas{display:block;border-radius:8px}
-.tip{position:absolute;background:#020617;border:1px solid #334155;border-radius:8px;padding:9px 13px;pointer-events:none;display:none;font-size:11px;min-width:190px;z-index:10;line-height:1.9;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+/* ── LANDING ── */
+#landing{
+  display:flex;flex-direction:column;align-items:center;
+  padding:60px 20px 40px;min-height:100vh;
+}
+.logo-row{display:flex;align-items:center;gap:12px;margin-bottom:48px;animation:fadeUp .6s ease both;}
+.logo-chip{
+  background:linear-gradient(135deg,#1d4ed8,#1e40af);
+  color:#fff;padding:4px 10px;border-radius:5px;
+  font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.08em;
+}
+.logo-name{font-family:var(--mono);font-size:12px;color:var(--text2);letter-spacing:.1em;text-transform:uppercase;}
 
-/* ── delta strip ── */
-.delta-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:8px}
-.dbox{background:var(--slate);border-radius:8px;padding:8px 6px;text-align:center;border:1px solid transparent;transition:border-color .3s}
-.dbox-spd{font-size:9px;color:#64748b;font-weight:700;margin-bottom:3px}
-.dbox-eff{font-size:15px;font-weight:700;font-family:var(--mono)}
-.dbox-range{font-size:9px;color:#94a3b8;margin-top:1px;font-family:var(--mono)}
-.dbox-delta{font-size:9px;font-family:var(--mono);margin-top:2px;font-weight:600}
-.dbox-mi{font-size:9px;color:var(--text-sub);margin-top:1px}
+.hero{text-align:center;max-width:680px;margin-bottom:64px;animation:fadeUp .7s .1s ease both;}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--green-dim);border:1px solid rgba(57,217,138,0.2);
+  color:var(--green);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  padding:5px 14px;border-radius:99px;margin-bottom:24px;
+}
+.hero-eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
 
-/* ── advanced panel ── */
-.adv-wrap{background:var(--slate2);border:1px solid var(--slate);border-radius:12px;margin-bottom:9px;overflow:hidden}
-.adv-toggle{width:100%;display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:transparent;font-family:'Outfit',sans-serif;cursor:pointer;transition:background .15s}
-.adv-toggle:hover{background:rgba(255,255,255,.03)}
-.adv-toggle-left{display:flex;align-items:center;gap:10px}
-.adv-toggle-icon{font-size:14px}
-.adv-toggle-text{font-size:12px;font-weight:700;color:#94a3b8}
-.adv-toggle-sub{font-size:10px;color:var(--text-muted);margin-top:1px}
-.adv-chevron{font-size:14px;color:var(--text-muted);transition:transform .3s}
-.adv-chevron.open{transform:rotate(180deg)}
-.adv-body{max-height:0;overflow:hidden;transition:max-height .45s cubic-bezier(.4,0,.2,1)}
-.adv-body.open{max-height:1200px}
-.adv-inner{padding:0 14px 14px}
-.sgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+h1{
+  font-family:var(--head);font-size:clamp(36px,6vw,68px);font-weight:800;
+  line-height:1.05;letter-spacing:-.02em;color:#fff;margin-bottom:20px;
+}
+h1 span{
+  background:linear-gradient(135deg,var(--green),var(--blue));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero-sub{font-size:17px;color:var(--text2);line-height:1.65;max-width:520px;margin:0 auto;}
 
-/* ── slider / toggle components ── */
-.sec{background:var(--slate2);border:1px solid var(--slate);border-radius:9px;padding:10px}
-.slbl{font-size:9px;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:4px;margin-bottom:7px}
-.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.sbox{margin-bottom:5px}
-.shdr{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px}
-.tw{display:flex;align-items:center;justify-content:space-between;gap:6px;background:var(--slate);border-radius:6px;padding:7px 9px;margin-bottom:5px}
-.ttrack{position:relative;width:38px;height:21px;border-radius:9999px;flex-shrink:0;border:none;transition:background .15s;cursor:pointer}
-.tthumb{position:absolute;top:3px;width:15px;height:15px;background:#fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,.4);transition:left .15s;pointer-events:none}
-.barbg{height:11px;background:var(--slate2);border-radius:9999px;overflow:hidden;margin:2px 0}
-.barfill{height:100%;border-radius:9999px;transition:width .2s}
+/* ── BRANCH CARDS ── */
+.branches{
+  display:grid;grid-template-columns:1fr 1fr;gap:20px;
+  width:100%;max-width:860px;animation:fadeUp .7s .2s ease both;
+}
+@media(max-width:620px){.branches{grid-template-columns:1fr;}}
 
-/* ── quick boxes ── */
-.qgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:9px}
-.qbox{background:var(--slate);border-radius:7px;padding:10px;text-align:center}
+.branch{
+  background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:36px 32px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;
+}
+.branch::before{
+  content:'';position:absolute;inset:0;border-radius:20px;opacity:0;
+  transition:opacity .25s;
+}
+.branch-simple::before{background:radial-gradient(ellipse at top left,rgba(57,217,138,0.08),transparent 60%);}
+.branch-advanced::before{background:radial-gradient(ellipse at top left,rgba(59,158,255,0.08),transparent 60%);}
+.branch:hover{transform:translateY(-3px);border-color:var(--border2);}
+.branch:hover::before{opacity:1;}
+.branch-simple:hover{border-color:rgba(57,217,138,0.3);box-shadow:0 20px 60px rgba(57,217,138,0.08);}
+.branch-advanced:hover{border-color:rgba(59,158,255,0.3);box-shadow:0 20px 60px rgba(59,158,255,0.08);}
 
-/* ── table ── */
-table{width:100%;border-collapse:collapse}
-th,td{padding:6px 10px;font-size:11px}
-th{color:#94a3b8;font-weight:600;border-bottom:1px solid var(--slate);text-align:center}
-th:first-child,td:first-child{text-align:left}
-td{border-bottom:1px solid var(--slate2);text-align:center}
+.branch-icon{font-size:36px;margin-bottom:18px;display:block;}
+.branch-tag{
+  display:inline-block;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  padding:3px 9px;border-radius:4px;margin-bottom:14px;
+}
+.branch-simple .branch-tag{background:var(--green-dim);color:var(--green);}
+.branch-advanced .branch-tag{background:var(--blue-dim);color:var(--blue);}
+.branch h2{font-family:var(--head);font-size:22px;font-weight:800;color:#fff;margin-bottom:10px;line-height:1.2;}
+.branch p{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:24px;}
+.branch-cta{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:13px;font-weight:700;padding:10px 20px;border-radius:9px;
+  border:none;cursor:pointer;font-family:var(--body);transition:all .2s;
+}
+.branch-simple .branch-cta{background:var(--green);color:#031a0a;}
+.branch-simple .branch-cta:hover{background:#4dffa0;}
+.branch-advanced .branch-cta{background:var(--blue);color:#010d1f;}
+.branch-advanced .branch-cta:hover{background:#6ab8ff;}
+.branch-cta-arrow{transition:transform .2s;}
+.branch:hover .branch-cta-arrow{transform:translateX(4px);}
 
-/* ── breakdown ── */
-.agrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:8px}
-.sum-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;padding:12px;margin-bottom:12px}
-pre{font-size:10px;line-height:1.6;white-space:pre-wrap;background:#020617;border-radius:7px;padding:12px;color:#86efac;margin-top:8px;font-family:var(--mono)}
+.branch-features{margin-top:0;}
+.bf{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text3);margin-bottom:6px;}
+.bf::before{content:'✓';font-size:10px;font-weight:700;}
+.branch-simple .bf::before{color:var(--green);}
+.branch-advanced .bf::before{color:var(--blue);}
 
-/* ── custom badge ── */
-.custom-pill{display:inline-block;background:#1a1a2e;border:1px solid #3b82f6;color:#93c5fd;font-size:9px;font-weight:700;padding:2px 7px;border-radius:9999px;margin-left:8px;vertical-align:middle;animation:pulse-in .3s ease-out}
-@keyframes pulse-in{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+/* ── GUIDED MODE ── */
+#guided{display:none;padding:40px 20px;max-width:680px;margin:0 auto;}
+.guided-header{text-align:center;margin-bottom:40px;animation:fadeUp .5s ease both;}
+.guided-header h2{font-family:var(--head);font-size:32px;font-weight:800;color:#fff;margin-bottom:8px;}
+.guided-header p{font-size:14px;color:var(--text2);}
 
-/* ── responsive ── */
-@media(max-width:1100px){.sgrid{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:900px){.sc-grid{grid-template-columns:repeat(4,1fr)}}
-@media(max-width:700px){.sgrid{grid-template-columns:repeat(2,1fr)}.sc-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:500px){.sgrid{grid-template-columns:1fr 1fr}.qgrid{grid-template-columns:1fr 1fr}.agrid{grid-template-columns:1fr 1fr 1fr}.sc-grid{grid-template-columns:1fr 1fr}.delta-strip{grid-template-columns:repeat(5,1fr)}}
+.questions{display:flex;flex-direction:column;gap:24px;}
+.q-block{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;animation:fadeUp .5s ease both;}
+.q-label{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:14px;}
+.q-title{font-size:16px;font-weight:600;color:var(--text);margin-bottom:16px;}
+.q-options{display:flex;flex-wrap:wrap;gap:8px;}
+.q-opt{
+  padding:9px 18px;border-radius:9px;border:1px solid var(--border);
+  background:transparent;color:var(--text2);font-family:var(--body);font-size:13px;
+  font-weight:500;cursor:pointer;transition:all .15s;
+}
+.q-opt:hover{border-color:var(--border2);color:var(--text);}
+.q-opt.sel{border-color:var(--green);background:var(--green-dim);color:var(--green);}
+
+.calc-btn{
+  width:100%;padding:16px;border-radius:12px;border:none;
+  background:linear-gradient(135deg,var(--green),#1eb86a);
+  color:#031a0a;font-family:var(--head);font-size:16px;font-weight:800;
+  cursor:pointer;transition:all .2s;margin-top:8px;letter-spacing:.02em;
+  opacity:.4;pointer-events:none;
+}
+.calc-btn.ready{opacity:1;pointer-events:all;}
+.calc-btn.ready:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(57,217,138,0.25);}
+
+/* ── RESULT ── */
+#result{display:none;padding:40px 20px;max-width:800px;margin:0 auto;}
+.result-header{text-align:center;margin-bottom:36px;}
+.result-header h2{font-family:var(--head);font-size:28px;font-weight:800;color:#fff;margin-bottom:6px;}
+.result-header p{font-size:14px;color:var(--text2);}
+
+.waterfall-wrap{
+  background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:32px;margin-bottom:20px;
+}
+.wf-title{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:24px;}
+
+#wf-canvas-wrap{position:relative;width:100%;}
+canvas#wf{display:block;width:100%;border-radius:8px;}
+
+/* tooltip */
+.wf-tip{
+  position:absolute;pointer-events:none;display:none;
+  background:#020c1a;border:1px solid var(--border2);border-radius:12px;
+  padding:14px 18px;min-width:220px;max-width:280px;z-index:20;
+  box-shadow:0 8px 40px rgba(0,0,0,.7);
+}
+.wf-tip-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:6px;}
+.wf-tip-km{font-family:var(--mono);font-size:22px;font-weight:500;margin-bottom:8px;}
+.wf-tip-body{font-size:12px;color:var(--text2);line-height:1.65;}
+
+.result-plain{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:24px;margin-bottom:20px;
+}
+.plain-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:12px;}
+.plain-text{font-size:15px;color:var(--text);line-height:1.75;}
+.plain-text strong{color:#fff;}
+.plain-text .highlight{color:var(--green);font-weight:600;}
+
+.result-actions{display:flex;gap:12px;flex-wrap:wrap;}
+.act-btn{
+  flex:1;min-width:160px;padding:13px 20px;border-radius:11px;
+  font-family:var(--body);font-size:13px;font-weight:700;cursor:pointer;
+  transition:all .2s;border:none;text-align:center;
+}
+.act-primary{background:var(--blue);color:#010d1f;}
+.act-primary:hover{background:#6ab8ff;}
+.act-secondary{background:var(--card);border:1px solid var(--border2);color:var(--text2);}
+.act-secondary:hover{color:var(--text);border-color:var(--green);}
+
+/* ── BACK BUTTON ── */
+.back-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  background:transparent;border:none;color:var(--text3);
+  font-family:var(--body);font-size:13px;cursor:pointer;
+  padding:8px 0;margin-bottom:24px;transition:color .15s;
+}
+.back-btn:hover{color:var(--text2);}
+
+/* ── UNIT TOGGLE ── */
+.unit-toggle{
+  display:flex;align-items:center;gap:6px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:99px;padding:4px;margin-bottom:32px;
+  animation:fadeUp .6s .05s ease both;
+}
+.unit-opt{
+  padding:7px 20px;border-radius:99px;border:none;
+  font-family:var(--body);font-size:12px;font-weight:700;
+  cursor:pointer;transition:all .2s;letter-spacing:.04em;
+  background:transparent;color:var(--text3);
+}
+.unit-opt.active{background:var(--blue);color:#fff;box-shadow:0 2px 12px rgba(59,158,255,0.3);}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── LEGEND ── */
+.wf-legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:20px;}
+.wf-leg{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);}
+.wf-leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
 </style>
 </head>
 <body>
-<div id="app"></div>
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+<div id="root">
+
+<!-- ══════════════════════════════════════════
+     LANDING PAGE
+══════════════════════════════════════════ -->
+<section id="landing">
+  <div class="logo-row">
+    <span class="logo-chip">EQUINOX EV</span>
+    <span class="logo-name">Range Intelligence</span>
+  </div>
+
+  <div class="unit-toggle" id="unit-toggle">
+    <button class="unit-opt" id="ut-km" onclick="setUnit('km')">🇨🇦 Kilometres</button>
+    <button class="unit-opt" id="ut-mi" onclick="setUnit('mi')">🇺🇸 Miles</button>
+  </div>
+
+  <div class="hero">
+    <div class="hero-eyebrow">
+      <span></span>Physics-based · 2024–2026 Chevrolet Equinox EV
+    </div>
+    <h1>The car tells you <span>what.</span><br>This tells you <span>why.</span></h1>
+    <p class="hero-sub">Your Equinox EV showed 320 km this morning. Now it says 190 km. Nothing unusual is happening — but understanding <em>why</em> makes all the difference.</p>
+  </div>
+
+  <div class="branches">
+    <!-- SIMPLE BRANCH -->
+    <div class="branch branch-simple" onclick="goGuided()">
+      <span class="branch-icon">🔋</span>
+      <span class="branch-tag">New owner · Quick answer</span>
+      <h2>Why did my range change?</h2>
+      <p>Answer three simple questions. Get a clear, visual physics-based estimate of where your range went — no jargon, plain English.</p>
+      <div class="branch-features">
+        <div class="bf">Takes under 60 seconds</div>
+        <div class="bf">Plain English explanations</div>
+        <div class="bf">Visual breakdown chart</div>
+      </div>
+      <br/>
+      <button class="branch-cta">Show me why <span class="branch-cta-arrow">→</span></button>
+    </div>
+
+    <!-- ADVANCED BRANCH -->
+    <div class="branch branch-advanced" onclick="goAdvanced()">
+      <span class="branch-icon">⚙️</span>
+      <span class="branch-tag">Enthusiast · Full control</span>
+      <h2>Explore the full physics</h2>
+      <p>Every variable. Every condition. Adjust speed, temperature, wind, grade, load, tire pressure and more with a live animated chart.</p>
+      <div class="branch-features">
+        <div class="bf">8 real-world scenarios</div>
+        <div class="bf">FWD & AWD comparison</div>
+        <div class="bf">Imperial & Metric</div>
+      </div>
+      <br/>
+      <button class="branch-cta">Open calculator <span class="branch-cta-arrow">→</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     GUIDED MODE — 3 QUESTIONS
+══════════════════════════════════════════ -->
+<section id="guided">
+  <button class="back-btn" onclick="goHome()">← Back</button>
+  <div class="guided-header">
+    <h2>Let's figure out your range</h2>
+    <p>Three quick questions and we'll show you exactly what's happening</p>
+  </div>
+
+  <div class="questions">
+    <!-- Q1: Season -->
+    <div class="q-block" style="animation-delay:.05s">
+      <div class="q-label">Question 1 of 3</div>
+      <div class="q-title">What's it like outside right now?</div>
+      <div class="q-options" id="q1">
+        <button class="q-opt" data-q="1" data-v="deep_winter" onclick="pick(this)">🥶 Deep winter (below -10°C / 14°F)</button>
+        <button class="q-opt" data-q="1" data-v="mild_winter" onclick="pick(this)">🧥 Mild winter (-10°C to 5°C / 14–41°F)</button>
+        <button class="q-opt" data-q="1" data-v="spring_fall" onclick="pick(this)">🍂 Spring / Fall (5°C to 18°C / 41–65°F)</button>
+        <button class="q-opt" data-q="1" data-v="summer" onclick="pick(this)">☀️ Summer (above 18°C / 65°F)</button>
+        <button class="q-opt" data-q="1" data-v="hot_summer" onclick="pick(this)">🌡️ Hot summer (above 30°C / 86°F)</button>
+      </div>
+    </div>
+
+    <!-- Q2: Driving -->
+    <div class="q-block" style="animation-delay:.1s">
+      <div class="q-label">Question 2 of 3</div>
+      <div class="q-title">What kind of driving are you doing?</div>
+      <div class="q-options" id="q2">
+        <button class="q-opt" data-q="2" data-v="city" onclick="pick(this)">🏙️ City — lots of stops and traffic lights</button>
+        <button class="q-opt" data-q="2" data-v="highway" onclick="pick(this)">🛣️ Highway — steady speed, mostly open road</button>
+        <button class="q-opt" data-q="2" data-v="mixed" onclick="pick(this)">🚗 Mixed — a bit of both</button>
+      </div>
+    </div>
+
+    <!-- Q3: Drivetrain -->
+    <div class="q-block" style="animation-delay:.15s">
+      <div class="q-label">Question 3 of 3</div>
+      <div class="q-title">Which Equinox EV do you have?</div>
+      <div class="q-options" id="q3">
+        <button class="q-opt" data-q="3" data-v="fwd" onclick="pick(this)">⚡ FWD — Single Motor (108 MPGe · 319 mi / 513 km)</button>
+        <button class="q-opt" data-q="3" data-v="awd" onclick="pick(this)">⚡⚡ AWD — Dual Motor (96 MPGe · 307 mi / 494 km)</button>
+        <button class="q-opt" data-q="3" data-v="unsure" onclick="pick(this)">🤔 Not sure — use FWD as default</button>
+      </div>
+    </div>
+
+    <button class="calc-btn" id="calc-btn" onclick="showResult()">Show me what happened to my range →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     RESULT
+══════════════════════════════════════════ -->
+<section id="result">
+  <button class="back-btn" onclick="goGuided()">← Change answers</button>
+  <div class="result-header">
+    <h2 id="result-title">Here's where your range went</h2>
+    <p id="result-sub">Based on your conditions today</p>
+  </div>
+
+  <div class="waterfall-wrap">
+    <div class="wf-title">Modelled range breakdown — km from full charge <span style='font-weight:400;color:#3d6080;font-size:10px'>(estimates only)</span></div>
+    <div id="wf-canvas-wrap">
+      <canvas id="wf"></canvas>
+      <div class="wf-tip" id="wf-tip">
+        <div class="wf-tip-title" id="tip-title"></div>
+        <div class="wf-tip-km" id="tip-km"></div>
+        <div class="wf-tip-body" id="tip-body"></div>
+      </div>
+    </div>
+    <div class="wf-legend" id="wf-legend"></div>
+  </div>
+
+  <div class="result-plain">
+    <div class="plain-label">In plain English</div>
+    <div class="plain-text" id="plain-text"></div>
+  </div>
+
+  <div class="result-actions">
+    <button class="act-btn act-primary" onclick="goAdvanced()">⚙️ Explore full calculator</button>
+    <button class="act-btn act-secondary" onclick="goGuided()">🔄 Try different conditions</button>
+  </div>
+</section>
+
+<div style="text-align:center;padding:24px 20px 32px;font-size:9px;color:#1e3a5f;max-width:700px;margin:0 auto;line-height:1.7;">Physics-based educational tool. Results are modelled estimates only — not for trip planning or safety-critical decisions. Real-world range varies. Not affiliated with or endorsed by General Motors Corporation.</div>
+</div><!-- #root -->
+
 <script>
 'use strict';
 
 // ================================================================
-// PHYSICS ENGINE
+// UNIT STATE
+// ================================================================
+var METRIC = true; // default km, user picks on landing
+
+function dDisp(km){
+  if(METRIC) return km+' km';
+  return Math.round(km/1.60934)+' mi';
+}
+function dDispSigned(km, isLoss){
+  var v = METRIC ? km : Math.round(km/1.60934);
+  return (isLoss?'-':'+')+v+(METRIC?' km':' mi');
+}
+
+function setUnit(u){
+  METRIC = (u==='km');
+  document.getElementById('ut-km').classList.toggle('active', METRIC);
+  document.getElementById('ut-mi').classList.toggle('active', !METRIC);
+  // If result is showing, redraw
+  if(WF_DATA){
+    drawWaterfall(WF_DATA);
+    buildLegend(WF_DATA.bars);
+    buildPlainText(WF_DATA);
+  }
+}
+
+// ================================================================
+// PHYSICS (minimal — same engine as main calculator)
 // ================================================================
 var CFG={
-  fwd:{label:"FWD Single Motor",eta:0.882,massAdd:0,  pack:79,epa_mi:319,mpge:108,awd:false},
-  awd:{label:"AWD Dual Motor",  eta:0.848,massAdd:68, pack:79,epa_mi:307,mpge:96, awd:true}
+  fwd:{label:'FWD Single Motor',eta:0.882,massAdd:0,pack:79,epa_mi:319,epa_km:513},
+  awd:{label:'AWD Dual Motor',  eta:0.848,massAdd:68,pack:79,epa_mi:307,epa_km:494}
 };
 var BM=2041,BCD=0.29,BA=2.60,BCR=0.009,GG=9.81,PACC=400,UA=160,AWD_CRR=0.0004;
 
-function rho(f,alt_ft){
-  alt_ft=alt_ft||0;
-  var rsl=1.2929*273.15/((f-32)*5/9+273.15);
-  var pr=Math.pow(1-2.2558e-5*alt_ft*0.3048,5.2559);
-  return rsl*pr;
-}
+function rho(f){return 1.2929*273.15/((f-32)*5/9+273.15);}
 function hpCOP(f){
-  // Smooth linear interpolation between measured COP points
-  // 0°F=1.0, 20°F=1.55, 30°F=2.0, 45°F=2.5, 60°F+=3.0
   if(f>=60)return 3.0;
   if(f>=45)return 2.5+(f-45)*(0.5/15);
   if(f>=30)return 2.0+(f-30)*(0.5/15);
   if(f>=20)return 1.55+(f-20)*(0.45/10);
-  if(f>=0) return 1.0 +(f-0) *(0.55/20);
+  if(f>=0) return 1.0+(f-0)*(0.55/20);
   return 1.0;
 }
 function acCOP(f){return f<=85?3:2.5;}
-function bEta(f,soh){
-  // Base thermal efficiency by temperature
-  var base;
-  if(f>=60)base=1.000;
-  else if(f>=40)base=0.975;
-  else if(f>=20)base=0.945;
-  else if(f>=5) base=0.905;
-  else           base=0.875;
-  // SOH penalty: degraded cells have higher internal resistance
-  // 100% SOH = no penalty; 80% SOH = ~2% extra loss
-  var sohPenalty=(soh!==undefined)?(100-soh)*0.001:0;
-  return Math.max(0.82, base-sohPenalty);
+function bEta(f){
+  if(f>=60)return 1.000;if(f>=40)return 0.975;
+  if(f>=20)return 0.945;if(f>=5)return 0.905;return 0.875;
 }
 function eCrr(p,aw,mass){
-  // Base Crr from PSI (lower pressure = more deformation = more resistance)
   var base=Math.max(0.007,BCR+(36-p)*0.00015);
-  // AWD bearing drag
   if(aw)base+=AWD_CRR;
-  // Load-dependent deformation: tires flatten more under heavier load
-  // +0.00004 per 100kg over base vehicle mass (2041kg)
   if(mass&&mass>BM)base+=0.00004*((mass-BM)/100);
   return base;
 }
 
-var TRAFFIC_MODES={
-  cruise:{label:"Steady Cruise",avgSpeedFrac:1.00,uaFrac:1.00,copPenalty:0.00},
-  mixed: {label:"Mixed Flow",   avgSpeedFrac:0.72,uaFrac:0.90,copPenalty:0.05},
-  stopgo:{label:"Stop-and-Go", avgSpeedFrac:0.38,uaFrac:0.75,copPenalty:0.12}
-};
-var SOLAR_LOADS={none:0,partial:220,full:500};
-
-function calcI(mph,af,dk,cf,seat,whl,defrost,wind,pax,cargo,roof,psi,grade,traffic,solar,alt,soh){
-  traffic=traffic||"cruise"; solar=solar||"none";
+function calcEff(mph,af,dk,cf,seat,whl,defrost,wind,pax,psi,traffic){
   var cfg=CFG[dk];
-  var mass=BM+cfg.massAdd+pax*82+cargo*0.4536;
-  var Cd=roof?BCD+0.10:BCD, Av=roof?BA+0.25:BA;
+  var mass=BM+cfg.massAdd+pax*82;
+  var Cd=BCD,Av=BA;
   var Crr=eCrr(psi,cfg.awd,mass);
-  var vg=mph*0.44704, va=Math.max(0,(mph+wind)*0.44704);
-  alt=alt||0; soh=soh||100;
-  var Pa=0.5*rho(af,alt)*Cd*Av*va*va*va;
+  var vg=mph*0.44704,va=Math.max(0,(mph+wind)*0.44704);
+  var avgFrac=traffic==='stopgo'?0.38:traffic==='mixed'?0.72:1.0;
+  var uaFrac=traffic==='stopgo'?0.75:traffic==='mixed'?0.90:1.0;
+  var Pa=0.5*rho(af)*Cd*Av*va*va*va;
   var Pr=Crr*mass*GG*vg;
-  var Pg=mass*GG*Math.sin(Math.atan(grade/100))*vg;
-  var Pt=(Pa+Pr+Pg)/cfg.eta;
-  var tm=TRAFFIC_MODES[traffic];
-  var avgMph=mph*tm.avgSpeedFrac;
-  var effUA=UA*tm.uaFrac;
-  var solarW=SOLAR_LOADS[solar];
-  var occupantW=100*pax;
+  var Pt=(Pa+Pr)/cfg.eta;
+  var effUA=UA*uaFrac;
+  var avgMph=mph*avgFrac;
   var dT=cf-af;
   var Ph_raw=0;
-  if(dT>2) Ph_raw=effUA*dT/hpCOP(af);
-  else if(dT<-2){var eCOP=acCOP(af)*(1-tm.copPenalty);Ph_raw=(effUA*Math.abs(dT)+solarW+occupantW)*0.55/eCOP;}
+  if(dT>2)Ph_raw=effUA*dT/hpCOP(af);
+  else if(dT<-2)Ph_raw=(effUA*Math.abs(dT))*0.55/acCOP(af);
   var Ph=avgMph>0?Ph_raw*(mph/avgMph):Ph_raw;
-  var Ps=seat?140:0,Pw=whl?25:0,Pd=defrost?250:0,be=bEta(af,soh);
-  var Pb=(Pt+Ph+Ps+Pw+Pd+PACC)/be;
-  var usablePack=cfg.pack*(soh/100);
-  return{Pa:Pa,Pr:Pr,Pg:Pg,Pt:Pt,Ph:Ph,Ph_raw:Ph_raw,Ps:Ps,Pw:Pw,Pd:Pd,Pb:Pb,be:be,
-    Cd:Cd,Crr:Crr,mass:mass,avgMph:avgMph,solarW:solarW,occupantW:occupantW,
-    usablePack:usablePack,eff:vg>0?Math.max(0,mph/(Pb/1000)):0};
+  var Ps=seat?140:0,Pw=whl?25:0;
+  var be=bEta(af);
+  var Pb=(Pt+Ph+Ps+Pw+PACC)/be;
+  return{eff:vg>0?Math.max(0,mph/(Pb/1000)):0,Pa:Pa,Pr:Pr,Pt:Pt,Ph:Ph,Ps:Ps,Pw:Pw,be:be,mass:mass,Crr:Crr};
 }
 
-var SPEEDS=[40,50,60,70,80];
-var TEMPS_F=[0,20,40,60,80,100];
-var TCLR=["#60a5fa","#34d399","#a78bfa","#fbbf24","#f87171","#fb923c"];
-
 // ================================================================
-// SCENARIOS
+// SCENARIO PRESETS
 // ================================================================
-var BASE_CASE={
-  ambientT:70,cabinT:72,wind:0,grade:0,
-  seat:false,whl:false,defrost:false,pax:1,cargo:0,roof:false,psi:42,
-  traffic:"cruise",solar:"none",alt:0,soh:100
+var PRESETS={
+  deep_winter:  {af:5,  cf:72,wind:5, seat:true, whl:true, psi:40,label:'Deep winter (-15°C / 5°F)'},
+  mild_winter:  {af:30, cf:72,wind:3, seat:true, whl:false,psi:41,label:'Mild winter (0°C / 32°F)'},
+  spring_fall:  {af:50, cf:72,wind:0, seat:false,whl:false,psi:42,label:'Spring/Fall (10°C / 50°F)'},
+  summer:       {af:72, cf:72,wind:0, seat:false,whl:false,psi:42,label:'Summer (22°C / 72°F)'},
+  hot_summer:   {af:95, cf:72,wind:0, seat:false,whl:false,psi:42,label:'Hot summer (35°C / 95°F)'},
 };
-
-var SCENARIOS=[
-  {
-    key:"jan_commute",
-    icon:"🥶",name:"January Commute",
-    sub:"10°F · heaters on · stop-and-go",
-    badge:"WINTER",badgeClass:"",
-    params:{ambientT:10,cabinT:72,wind:5,grade:0,seat:true,whl:true,defrost:true,
-            pax:1,cargo:0,roof:false,psi:40,traffic:"stopgo",solar:"none",alt:0,soh:100}
-  },
-  {
-    key:"aug_errand",
-    icon:"☀️",name:"August Errand Run",
-    sub:"95°F · A/C on · full sun · mixed traffic",
-    badge:"SUMMER",badgeClass:"warm",
-    params:{ambientT:95,cabinT:72,wind:0,grade:0,seat:false,whl:false,defrost:false,
-            pax:1,cargo:0,roof:false,psi:42,traffic:"mixed",solar:"full",alt:0,soh:100}
-  },
-  {
-    key:"city_commute",
-    icon:"🏙️",name:"City Commute",
-    sub:"45°F · stop-and-go · seat heat on",
-    badge:"AUTUMN",badgeClass:"",
-    params:{ambientT:45,cabinT:72,wind:0,grade:0,seat:true,whl:false,defrost:false,
-            pax:1,cargo:0,roof:false,psi:42,traffic:"stopgo",solar:"none",alt:0,soh:100}
-  },
-  {
-    key:"road_trip",
-    icon:"👨‍👩‍👧‍👦",name:"Family Road Trip",
-    sub:"70°F · 4 people · luggage · headwind",
-    badge:"HIGHWAY",badgeClass:"base",
-    params:{ambientT:70,cabinT:72,wind:10,grade:0,seat:false,whl:false,defrost:false,
-            pax:4,cargo:400,roof:false,psi:42,traffic:"cruise",solar:"none",alt:0,soh:100}
-  },
-  {
-    key:"windy_hwy",
-    icon:"🌬️",name:"Windy Highway",
-    sub:"70°F · 20mph headwind · solo",
-    badge:"WIND",badgeClass:"base",
-    params:{ambientT:70,cabinT:72,wind:20,grade:0,seat:false,whl:false,defrost:false,
-            pax:1,cargo:0,roof:false,psi:42,traffic:"cruise",solar:"none",alt:0,soh:100}
-  },
-  {
-    key:"mountain",
-    icon:"⛰️",name:"Mountain Drive",
-    sub:"60°F · 4% uphill grade · solo",
-    badge:"GRADE",badgeClass:"base",
-    params:{ambientT:60,cabinT:72,wind:0,grade:4,seat:false,whl:false,defrost:false,
-            pax:1,cargo:0,roof:false,psi:42,traffic:"cruise",solar:"none",alt:2000,soh:100}
-  },
-  {
-    key:"best_case",
-    icon:"💨",name:"Best Case Boost",
-    sub:"65°F · 15mph tailwind · solo",
-    badge:"BONUS",badgeClass:"warm",
-    params:{ambientT:65,cabinT:72,wind:-15,grade:0,seat:false,whl:false,defrost:false,
-            pax:1,cargo:0,roof:false,psi:44,traffic:"cruise",solar:"none",alt:0,soh:100}
-  },
-  {
-    key:"perfect",
-    icon:"🌤️",name:"Perfect Day",
-    sub:"70°F · calm · solo · ideal conditions",
-    badge:"BASE",badgeClass:"base",
-    params:{ambientT:70,cabinT:72,wind:0,grade:0,seat:false,whl:false,defrost:false,
-            pax:1,cargo:0,roof:false,psi:42,traffic:"cruise",solar:"none",alt:0,soh:100}
-  }
-];
-
-// ================================================================
-// UNIT HELPERS
-// ================================================================
-function fToC(f){return(f-32)*5/9;}
-function cToF(c){return c*9/5+32;}
-function mToK(m){return m*1.60934;}
-function kToM(k){return k/1.60934;}
-function dTemp(f){return ST.metric?Math.round(fToC(f))+"\u00b0C":f+"\u00b0F";}
-function dSpeed(mph){return ST.metric?Math.round(mToK(mph))+" km/h":mph+" mph";}
-function dUnit(){return ST.metric?"km/kWh":"mi/kWh";}
-function dEff(v){return ST.metric?(v*1.60934).toFixed(2):v.toFixed(2);}
-function dEffL(v){return ST.metric?(v*1.60934).toFixed(3):v.toFixed(3);}
-function dRange(mi){return ST.metric?Math.round(mToK(mi))+" km":mi+" mi";}
-function dMass(kg){return ST.metric?kg+" kg":Math.round(kg*2.205)+" lb";}
-function dWind(mph){
-  if(mph===0)return"Calm";
-  return ST.metric?(mph>0?"+":"")+Math.round(mToK(mph))+" km/h":(mph>0?"+"+mph+" mph headwind":Math.abs(mph)+" mph tailwind");
-}
-function dGrade(g){return g===0?"Level":g>0?"+"+g+"% uphill":g+"% downhill";}
-function epaEff(dk){var c=CFG[dk];var b=c.mpge/33.705;return ST.metric?b*1.60934:b;}
+var TRAFFIC_MAP={city:'stopgo',highway:'cruise',mixed:'mixed'};
+var SPEED_MAP={city:40,highway:65,mixed:55};
 
 // ================================================================
 // STATE
 // ================================================================
+var SEL={1:null,2:null,3:null};
 
-// Geo defaults injected by Netlify edge function
-// Falls back gracefully if running locally or edge function absent
-var GEO=window.__GEO__||{country:"US",defaultMetric:false,season:"winter",defaultScenario:"jan_commute"};
-
-// Unit preference: localStorage beats geo beats default
-// If user has ever manually set a preference we respect it forever
-var storedMetric=null;
-try{
-  var ls=localStorage.getItem('equinox_metric');
-  if(ls!==null)storedMetric=ls==='1';
-}catch(e){}
-var initialMetric=storedMetric!==null?storedMetric:GEO.defaultMetric;
-
-var ST=Object.assign({
-  metric:initialMetric,
-  dt:"fwd",view:"chart",selSpd:70,
-  activeScenario:GEO.defaultScenario,
-  isCustom:false,
-  advOpen:false
-},BASE_CASE);
-
-function c6(mph,tF,dk){
-  return calcI(mph,tF||ST.ambientT,dk||ST.dt,ST.cabinT,ST.seat,ST.whl,ST.defrost,
-               ST.wind,ST.pax,ST.cargo,ST.roof,ST.psi,ST.grade,ST.traffic,ST.solar,ST.alt,ST.soh);
+function pick(btn){
+  var q=+btn.dataset.q, v=btn.dataset.v;
+  SEL[q]=v;
+  document.querySelectorAll('[data-q="'+q+'"]').forEach(function(b){b.classList.remove('sel');});
+  btn.classList.add('sel');
+  checkReady();
 }
 
-function getBaseEffs(){
-  return SPEEDS.map(function(mph){
-    var r=calcI(mph,BASE_CASE.ambientT,ST.dt,BASE_CASE.cabinT,
-               BASE_CASE.seat,BASE_CASE.whl,BASE_CASE.defrost,
-               BASE_CASE.wind,BASE_CASE.pax,BASE_CASE.cargo,BASE_CASE.roof,
-               BASE_CASE.psi,BASE_CASE.grade,BASE_CASE.traffic,BASE_CASE.solar,
-               BASE_CASE.alt,BASE_CASE.soh);
-    return ST.metric?+(r.eff*1.60934).toFixed(3):+r.eff.toFixed(3);
+function checkReady(){
+  var btn=document.getElementById('calc-btn');
+  if(SEL[1]&&SEL[2]&&SEL[3]){btn.classList.add('ready');}
+  else{btn.classList.remove('ready');}
+}
+
+// ================================================================
+// NAVIGATION
+// ================================================================
+function goHome(){
+  document.getElementById('landing').style.display='flex';
+  document.getElementById('guided').style.display='none';
+  document.getElementById('result').style.display='none';
+  window.scrollTo(0,0);
+}
+function goGuided(){
+  document.getElementById('landing').style.display='none';
+  document.getElementById('guided').style.display='block';
+  document.getElementById('result').style.display='none';
+  window.scrollTo(0,0);
+}
+function goAdvanced(){
+  // In production this would be: window.location.href='calculator.html';
+  // For demo, show a message
+  alert('This would open the full Equinox EV Physics Calculator.\n\nIn production, link this button to your existing index.html');
+}
+
+// ================================================================
+// WATERFALL CALCULATION
+// ================================================================
+function buildWaterfall(season, driveType, dk){
+  var preset=PRESETS[season];
+  var traffic=TRAFFIC_MAP[driveType];
+  var mph=SPEED_MAP[driveType];
+  var cfg=CFG[dk==='unsure'?'fwd':dk];
+  var actualDk=dk==='unsure'?'fwd':dk;
+
+  // Perfect base: 70°F, cruise, 65mph, no accessories
+  var base=calcEff(65,70,actualDk,72,false,false,false,0,1,42,'cruise');
+  var baseRangeKm=Math.round(base.eff*cfg.pack*1.60934);
+
+  // Actual conditions
+  var actual=calcEff(mph,preset.af,actualDk,preset.cf,preset.seat,preset.whl,false,preset.wind,1,preset.psi,traffic);
+  var actualRangeKm=Math.round(actual.eff*cfg.pack*1.60934);
+
+  // --- Build loss components ---
+  // We isolate each effect by toggling one variable at a time from base
+  var r={}; // intermediate results
+
+  // 1. Temperature effect on battery (bEta loss)
+  var bEtaLoss=base.eff*(1-actual.be/base.be);
+  var bEtaKm=Math.round(bEtaLoss*cfg.pack*1.60934);
+
+  // 2. HVAC (heating or cooling)
+  var hvacEff=calcEff(mph,preset.af,actualDk,preset.cf,false,false,false,0,1,42,'cruise');
+  var hvacOnlyEff=calcEff(mph,70,actualDk,70,false,false,false,0,1,42,'cruise'); // no hvac
+  var hvacLoss=hvacEff.eff-hvacOnlyEff.eff; // negative = loss
+  var hvacKm=Math.abs(Math.round(hvacLoss*cfg.pack*1.60934));
+  var isHeating=preset.cf>preset.af+2;
+  var isCooling=preset.af>preset.cf+2;
+
+  // 3. Speed effect (65mph base vs actual mph)
+  var speedEff=calcEff(mph,70,actualDk,72,false,false,false,0,1,42,'cruise');
+  var speedBase=calcEff(65,70,actualDk,72,false,false,false,0,1,42,'cruise');
+  var speedLoss=speedBase.eff-speedEff.eff;
+  var speedKm=Math.round(speedLoss*cfg.pack*1.60934);
+
+  // 4. Traffic / stop-go
+  var trafficEff=calcEff(mph,preset.af,actualDk,preset.cf,false,false,false,0,1,42,traffic);
+  var noTrafficEff=calcEff(mph,preset.af,actualDk,preset.cf,false,false,false,0,1,42,'cruise');
+  var trafficLoss=noTrafficEff.eff-trafficEff.eff;
+  var trafficKm=Math.round(trafficLoss*cfg.pack*1.60934);
+
+  // 5. Seat heaters if on
+  var seatKm=preset.seat?Math.round((140/1000)/actual.eff*cfg.pack*1.60934*0.15):0;
+
+  // Recalculate actual to make sure bars sum correctly
+  // Use actual range and distribute proportionally
+  var totalLossKm=baseRangeKm-actualRangeKm;
+  var rawTotal=bEtaKm+hvacKm+Math.max(0,speedKm)+Math.max(0,trafficKm)+seatKm;
+
+  // Scale losses to match actual total (physics rounding)
+  var scale=rawTotal>0?totalLossKm/rawTotal:1;
+  bEtaKm=Math.round(bEtaKm*scale);
+  hvacKm=Math.round(hvacKm*scale);
+  speedKm=Math.round(Math.max(0,speedKm)*scale);
+  trafficKm=Math.round(Math.max(0,trafficKm)*scale);
+  seatKm=Math.round(seatKm*scale);
+
+  // Build bars array
+  var bars=[];
+  bars.push({
+    label:'Max Range',
+    km:baseRangeKm,
+    isAnchor:true,anchorType:'start',
+    color:'#3b9eff',
+    emoji:'⚡',
+    tip:{title:'⚡ Maximum Rated Range',km_val:baseRangeKm,mi_val:Math.round(baseRangeKm/1.60934),
+      body:'This is your Equinox EV\'s ideal range — 65 mph, 21°C, no heating or cooling, perfect battery temperature. Think of this as your ceiling on a perfect day.'}
   });
-}
 
-// ================================================================
-// PERMALINK
-// ================================================================
-var PKEYS=['metric','dt','ambientT','cabinT','wind','grade','seat','whl','defrost',
-           'pax','cargo','roof','psi','traffic','solar','alt','soh','view','selSpd',
-           'activeScenario','advOpen'];
-
-function encodeState(){
-  try{
-    var p=PKEYS.map(function(k){
-      var v=ST[k];
-      return k+'='+(typeof v==='boolean'?(v?1:0):encodeURIComponent(v));
+  if(bEtaKm>2){
+    bars.push({
+      label:'Cold battery',km:bEtaKm,isLoss:true,
+      color:'#a78bfa',emoji:'🔋',
+      tip:{title:'🔋 Cold Battery Loss',km:'-'+bEtaKm+' km',
+        body:'Lithium batteries are less efficient in cold weather. Internal resistance rises, meaning more energy is wasted as heat inside the cells just moving electricity around. This is physics — it happens in every EV and every phone battery in winter.'}
     });
-    return'#'+p.join('&');
-  }catch(e){return'';}
-}
-function decodeState(hash){
-  if(!hash||hash.length<2)return;
-  hash.slice(1).split('&').forEach(function(pair){
-    var eq=pair.indexOf('=');if(eq<0)return;
-    var k=pair.slice(0,eq),v=decodeURIComponent(pair.slice(eq+1));
-    if(!(k in ST))return;
-    if(typeof ST[k]==='boolean')ST[k]=v==='1';
-    else if(typeof ST[k]==='number')ST[k]=+v;
-    else ST[k]=v;
-  });
-}
-function copyPermalink(){
-  var url='';
-  try{url=window.location.href.split('#')[0]+encodeState();}catch(e){url=encodeState();}
-  var btn=$id('copy-btn');
-  function flash(){if(btn){btn.textContent='✓ Copied!';btn.style.background='#166534';setTimeout(function(){btn.textContent='Share Link';btn.style.background='';},2000);}}
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(url).then(flash).catch(function(){fallbackCopy(url);flash();});
-  }else{fallbackCopy(url);flash();}
-}
-function fallbackCopy(url){
-  var ta=document.createElement('textarea');ta.value=url;ta.style.cssText='position:fixed;opacity:0';
-  document.body.appendChild(ta);ta.select();try{document.execCommand('copy');}catch(e){}
-  document.body.removeChild(ta);
-}
-try{if(window.location&&window.location.hash)decodeState(window.location.hash);}catch(e){}
-// ================================================================
-// GEO DEFAULTS (from Netlify edge function)
-// ================================================================
-(function applyGeoDefaults(){
-  try{
-    if(window.__GEO__&&!(window.location&&window.location.hash&&window.location.hash.length>1)){
-      ST.metric=!!window.__GEO__.defaultMetric;
-      if(window.__GEO__.defaultScenario){
-        ST.activeScenario=window.__GEO__.defaultScenario;
-        var sc=typeof SCENARIOS!=='undefined'&&SCENARIOS.filter(function(s){return s.key===window.__GEO__.defaultScenario;})[0];
-        if(sc)Object.assign(ST,sc.params);
-      }
-    }
-  }catch(e){}
-})();
+  }
 
-
-// ================================================================
-// DOM HELPERS
-// ================================================================
-function el(tag,attrs,ch){
-  var d=document.createElement(tag);
-  if(attrs)Object.keys(attrs).forEach(function(k){
-    if(k==='style'&&typeof attrs[k]==='object')Object.assign(d.style,attrs[k]);
-    else if(k==='class')d.className=attrs[k];
-    else d[k]=attrs[k];
-  });
-  if(ch){
-    if(!Array.isArray(ch))ch=[ch];
-    ch.forEach(function(c){
-      if(c!=null&&c!==false){
-        if(typeof c==='string'||typeof c==='number')d.appendChild(document.createTextNode(String(c)));
-        else d.appendChild(c);
-      }
+  if(hvacKm>2&&isHeating){
+    bars.push({
+      label:'Cabin heating',km:hvacKm,isLoss:true,
+      color:'#ff8c42',emoji:'🌡️',
+      tip:{title:'🌡️ Cabin Heating',km:'-'+hvacKm+' km',
+        body:'Your heat pump is working hard to warm the cabin from '+Math.round((preset.af-32)*5/9)+'°C to '+Math.round((preset.cf-32)*5/9)+'°C. Below about -10°C it switches to resistive heating (like a toaster) which is 2–3× less efficient than the heat pump. This is often the single biggest range drain in winter.'}
     });
   }
-  return d;
-}
-function $id(i){return document.getElementById(i);}
-
-function mkSlider(o){
-  var w=el('div',{class:'mini sbox'});
-  var h=el('div',{class:'shdr'});
-  var lv=el('span',{class:'mono',style:{fontSize:'11px',fontWeight:'700'}});
-  function disp(v){return o.fmt?o.fmt(v):v+(o.unit||'');}
-  lv.textContent=disp(o.value);
-  var lt=o.emoji?o.emoji+' '+o.label:o.label;
-  h.appendChild(el('span',{style:{fontSize:'10px',color:'#90EE90',fontWeight:'600'}},lt));
-  h.appendChild(lv);w.appendChild(h);
-  if(o.sub)w.appendChild(el('div',{style:{fontSize:'9px',color:'#90EE90',marginBottom:'2px'}},o.sub));
-  var inp=el('input',{type:'range',min:o.min,max:o.max,step:o.step||1,value:o.value});
-  function upd(v){
-    var pct=((v-o.min)/(o.max-o.min))*100;
-    var cc=o.color||'#3b82f6';
-    inp.style.background='linear-gradient(to right,'+cc+' '+pct+'%,#334155 '+pct+'%)';
-    lv.style.color=cc;lv.textContent=disp(v);
+  if(hvacKm>2&&isCooling){
+    bars.push({
+      label:'Air conditioning',km:hvacKm,isLoss:true,
+      color:'#ff8c42',emoji:'❄️',
+      tip:{title:'❄️ Air Conditioning',km:'-'+hvacKm+' km',
+        body:'Cooling the cabin from '+Math.round((preset.af-32)*5/9)+'°C down to '+Math.round((preset.cf-32)*5/9)+'°C uses your A/C compressor. Hot weather A/C can draw 1–2 kW continuously — significant but less than winter heating.'}
+    });
   }
-  upd(o.value);
-  inp.addEventListener('input',function(){var v=+inp.value;upd(v);o.onChange(v);});
-  w.appendChild(inp);
-  var ends=el('div',{style:{display:'flex',justifyContent:'space-between',fontSize:'9px',color:'#90EE90',marginTop:'1px'}});
-  ends.appendChild(el('span',null,o.min+(o.unit||'')));
-  ends.appendChild(el('span',null,o.max+(o.unit||'')));
-  w.appendChild(ends);
-  return w;
-}
 
-function mkToggle(o){
-  var w=el('div',{class:'tw'});
-  var inf=el('div',{style:{flex:'1',minWidth:'0'}});
-  var lt=o.emoji?o.emoji+' '+o.label:o.label;
-  inf.appendChild(el('div',{style:{fontSize:'10px',color:'#cbd5e1',fontWeight:'600'}},lt));
-  inf.appendChild(el('div',{style:{fontSize:'9px',color:'#90EE90',marginTop:'1px'}},o.sub));
-  var we=el('div',{class:'mono',style:{fontSize:'9px',color:'#f97316',marginTop:'1px',display:'none'}},o.watts+'W');
-  inf.appendChild(we);
-  var tr=el('button',{class:'ttrack'});
-  var th2=el('div',{class:'tthumb'});tr.appendChild(th2);
-  var on=o.value||false;
-  function set(v){on=v;tr.style.background=v?'#2563eb':'#334155';th2.style.left=v?'20px':'3px';we.style.display=(v&&o.watts>0)?'block':'none';}
-  set(on);tr.addEventListener('click',function(){set(!on);o.onChange(on);});
-  w.appendChild(inf);w.appendChild(tr);
-  return w;
-}
-
-function mkLbl(col,txt){
-  var d=el('div',{class:'slbl'});
-  d.appendChild(el('div',{class:'dot',style:{background:col}}));
-  d.appendChild(document.createTextNode(txt));
-  return d;
-}
-
-// ================================================================
-// COLOUR HELPERS
-// ================================================================
-function barCol(eff,epa){
-  var p=(eff-epa)/epa*100;
-  if(p>5) return'#22c55e';if(p>0)return'#86efac';
-  if(p>-5)return'#facc15';if(p>-15)return'#f97316';return'#ef4444';
-}
-function effCol(mpk,dk){
-  var e=epaEff(dk),v=ST.metric?mpk*1.60934:mpk,p=(v-e)/e*100;
-  if(p>5)return'#22c55e';if(p>0)return'#86efac';
-  if(p>-5)return'#facc15';if(p>-15)return'#f97316';return'#ef4444';
-}
-function shd(hex,f){
-  var r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
-  return'rgb('+Math.min(255,Math.round(r*f))+','+Math.min(255,Math.round(g*f))+','+Math.min(255,Math.round(b*f))+')';
-}
-
-// ================================================================
-// ANIMATION ENGINE
-// ================================================================
-var ANIM={
-  // current rendered bar heights (in efficiency units)
-  curH: SPEEDS.map(function(){return 0;}),
-  // target heights
-  tgtH: SPEEDS.map(function(){return 0;}),
-  // base case heights (ghost — static once computed)
-  baseH: SPEEDS.map(function(){return 0;}),
-  // temp slider animation
-  tempCur: BASE_CASE.ambientT,
-  tempTgt: BASE_CASE.ambientT,
-  // RAF handle
-  raf: null,
-  // animation start times per bar
-  startT: null,
-  duration: 520,
-  // easing: ease-out cubic
-  ease: function(t){return 1-Math.pow(1-t,3);},
-  // overshoot spring at end of travel
-  spring: function(t){
-    if(t<0.85)return this.ease(t/0.85);
-    var s=(t-0.85)/0.15;
-    // tiny overshoot then settle
-    return 1+Math.sin(s*Math.PI)*0.025*(1-s);
+  if(speedKm>2){
+    bars.push({
+      label:'Speed drag',km:speedKm,isLoss:true,
+      color:'#fbbf24',emoji:'💨',
+      tip:{title:'💨 Aerodynamic Drag',km:'-'+speedKm+' km',
+        body:'Air resistance grows with the cube of speed. Going from 65 mph to your current speed changes aero drag significantly. Highway driving at higher speeds is the most common reason real-world range falls below the rated figure.'}
+    });
   }
-};
 
-function animateTo(newEffs, newTemp){
-  ANIM.tgtH=newEffs.slice();
-  ANIM.tempTgt=newTemp!==undefined?newTemp:ST.ambientT;
-  if(ANIM.raf){cancelAnimationFrame(ANIM.raf);ANIM.raf=null;}
-  var startH=ANIM.curH.slice();
-  var startTemp=ANIM.tempCur;
-  var t0=null;
-
-  function frame(ts){
-    if(!t0)t0=ts;
-    var elapsed=ts-t0;
-    var p=Math.min(1,elapsed/ANIM.duration);
-
-    // stagger bars slightly
-    for(var i=0;i<SPEEDS.length;i++){
-      var delay=i*30; // 30ms stagger between bars
-      var lp=Math.min(1,Math.max(0,(elapsed-delay)/(ANIM.duration-delay*SPEEDS.length*0.5)));
-      var ep=ANIM.spring(lp);
-      ANIM.curH[i]=startH[i]+(ANIM.tgtH[i]-startH[i])*ep;
-    }
-
-    // temp slider smooth
-    var tp=ANIM.ease(p);
-    ANIM.tempCur=startTemp+(ANIM.tempTgt-startTemp)*tp;
-    updateTempSliderVisual(ANIM.tempCur);
-
-    drawChart();
-
-    if(p<1){ANIM.raf=requestAnimationFrame(frame);}
-    else{
-      ANIM.curH=ANIM.tgtH.slice();
-      ANIM.tempCur=ANIM.tempTgt;
-      updateTempSliderVisual(ANIM.tempCur);
-      drawChart();
-      ANIM.raf=null;
-    }
+  if(trafficKm>2){
+    bars.push({
+      label:'Stop & go',km:trafficKm,isLoss:true,
+      color:'#f87171',emoji:'🚦',
+      tip:{title:'🚦 Stop-and-Go Traffic',km:'-'+trafficKm+' km',
+        body:'In stop-and-go traffic your HVAC system costs more per km because you\'re covering less distance per minute while still heating or cooling the cabin. Regenerative braking recovers some energy but not all. City driving is harder on range than steady highway for an EV in cold weather.'}
+    });
   }
-  ANIM.raf=requestAnimationFrame(frame);
-}
 
-// ================================================================
-// TEMP SLIDER VISUAL UPDATE (DOM)
-// ================================================================
-function updateTempSliderVisual(tempF){
-  var inp=$id('temp-inp');if(!inp)return;
-  inp.value=Math.round(tempF);
-  var p=tempF/100;
-  var pct=p*100;
-  var green=Math.min(pct*0.40/Math.max(p,0.001),pct);
-  var yellow=Math.min(pct*0.65/Math.max(p,0.001),pct);
-  var grad='linear-gradient(to right,#3b82f6 0%,#34d399 '+green.toFixed(1)+'%,#fbbf24 '+yellow.toFixed(1)+'%,#f87171 '+pct.toFixed(1)+'%,#334155 '+pct.toFixed(1)+'%)';
-  inp.style.background=grad;
-  var ve=$id('temp-val');if(ve)ve.textContent=dTemp(Math.round(tempF));
-  var ticks=document.querySelectorAll('.temp-tick');
-  var TICK_TEMPS=[0,10,20,30,40,50,60,70,80,90,100];
-  ticks.forEach(function(tk,i){
-    var isActive=Math.abs(TICK_TEMPS[i]-Math.round(tempF))<6;
-    tk.style.color=isActive?'#60a5fa':'#475569';
-    tk.style.fontWeight=isActive?'700':'400';
+  if(seatKm>2){
+    bars.push({
+      label:'Seat heaters',km:seatKm,isLoss:true,
+      color:'#34d399',emoji:'🪑',
+      tip:{title:'🪑 Seat & Wheel Heaters',km:'-'+seatKm+' km',
+        body:'Seat heaters draw about 140W — modest compared to cabin heating, but continuous. The trick: seat heaters warm you directly, so you can often lower the cabin temperature setpoint and save more than the seat heaters cost. Net effect can actually be positive in mild cold.'}
+    });
+  }
+
+  bars.push({
+    label:'Your range today',
+    km:actualRangeKm,
+    isAnchor:true,anchorType:'end',
+    color:'#39d98a',emoji:'🏁',
+    tip:{title:'🏁 Your Range Today',km:actualRangeKm+' km',
+      body:'This is your modelled range estimate for today\'s conditions. This is normal and expected — physics models predict this outcome. Actual range varies with your specific driving. As temperatures improve, your range will too. <span style='color:#475569;font-size:13px'>These are modelled estimates — actual range varies with your specific driving conditions.</span>'}
   });
+
+  return{bars:bars,baseKm:baseRangeKm,actualKm:actualRangeKm,preset:preset,dk:actualDk,cfg:cfg,traffic:traffic};
 }
 
 // ================================================================
-// CHART DRAW (ghost bar + solid bar)
+// WATERFALL CHART DRAW
 // ================================================================
-var chartCanvas=null,chartTip=null;
+var WF_DATA=null;
+var WF_ZONES=[];
 
-function drawChart(){
-  var canvas=chartCanvas;if(!canvas)return;
-  var W=0;try{W=canvas.parentElement?canvas.parentElement.clientWidth||0:0;}catch(e){}if(!W||W<100)W=700;
-  var H=Math.max(240,Math.min(400,Math.round(W*0.42)));
-  var dpr=1;try{dpr=window.devicePixelRatio||1;}catch(e){}
+function drawWaterfall(data){
+  var canvas=document.getElementById('wf');
+  var wrap=document.getElementById('wf-canvas-wrap');
+  var W=wrap.clientWidth||700;
+  var dpr=window.devicePixelRatio||1;
+  var H=Math.max(300,Math.min(460,Math.round(W*0.58)));
   canvas.width=W*dpr;canvas.height=H*dpr;
   canvas.style.width=W+'px';canvas.style.height=H+'px';
   var ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
 
-  var PL=54,PR=18,PT=28,PB=48;
-  var cw=W-PL-PR,ch=H-PT-PB,n=SPEEDS.length;
-  var ANG=22*Math.PI/180,DLEN=18;
-  var DX=Math.cos(ANG)*DLEN,DY=-Math.sin(ANG)*DLEN;
-  var plotW=cw-DX,slotW=plotW/n,bw=slotW*0.72,gap=(slotW-bw)/2;
+  var PL=58,PR=24,PT=40,PB=64;
+  var cw=W-PL-PR,ch=H-PT-PB;
+  var bars=data.bars;
+  var n=bars.length;
+  var slotW=cw/n,bw=slotW*0.62,gap=(slotW-bw)/2;
 
-  var epa=epaEff(ST.dt);
-  // y range covers both current bars and base ghost bars
-  var allVals=ANIM.curH.concat(ANIM.baseH).concat([epa]);
-  var yMn=Math.max(0,Math.floor(Math.min.apply(null,allVals)*0.88*10)/10);
-  var yMx=Math.ceil(Math.max.apply(null,allVals)*1.10*10)/10;
-  if(yMx<=yMn)yMx=yMn+0.5;
-  var scY=ch/(yMx-yMn);
-  var ox=PL,oy=PT+ch;
+  var maxVal=data.baseKm;
+  var scY=ch/maxVal;
 
-  function fx(xi,yi){return{x:ox+xi,y:oy-yi};}
-  function bk(xi,yi){return{x:ox+xi+DX,y:oy-yi+DY};}
+  WF_ZONES=[];
 
-  ctx.fillStyle='#0f172a';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#060f1e';ctx.fillRect(0,0,W,H);
 
-  // grid
-  var yStep=0.5,ticks=[],ts=Math.ceil((yMn+0.001)/yStep)*yStep;
-  for(var tv=ts;tv<=yMx-0.001;tv=Math.round((tv+yStep)*1000)/1000)ticks.push(Math.round(tv*100)/100);
-  ctx.strokeStyle='#1e293b';ctx.lineWidth=1;
-  ticks.forEach(function(y){
-    var yi=(y-yMn)*scY,f1=fx(0,yi),f2=fx(plotW,yi),b2=bk(plotW,yi);
-    ctx.setLineDash([3,3]);
-    ctx.beginPath();ctx.moveTo(f1.x,f1.y);ctx.lineTo(f2.x,f2.y);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(f2.x,f2.y);ctx.lineTo(b2.x,b2.y);ctx.stroke();
-    ctx.setLineDash([]);
-  });
-  ctx.fillStyle='#94a3b8';ctx.font='10px sans-serif';ctx.textAlign='right';
-  ticks.forEach(function(y){var yi=(y-yMn)*scY,p=fx(0,yi);ctx.fillText(y.toFixed(1),p.x-5,p.y+4);});
-  ctx.save();ctx.translate(12,PT+ch/2);ctx.rotate(-Math.PI/2);
-  ctx.fillStyle='#64748b';ctx.font='10px sans-serif';ctx.textAlign='center';
-  ctx.fillText(dUnit(),0,0);ctx.restore();
-
-  // EPA plane
-  canvas._epaZone=null;
-  if(epa>=yMn&&epa<=yMx){
-    var eyi=(epa-yMn)*scY;
-    var c1=fx(0,eyi),c2=fx(plotW,eyi),c3=bk(plotW,eyi),c4=bk(0,eyi);
-    ctx.save();ctx.globalAlpha=0.10;ctx.fillStyle='#facc15';
-    ctx.beginPath();ctx.moveTo(c1.x,c1.y);ctx.lineTo(c2.x,c2.y);ctx.lineTo(c3.x,c3.y);ctx.lineTo(c4.x,c4.y);ctx.closePath();ctx.fill();
-    ctx.globalAlpha=0.5;ctx.strokeStyle='#facc15';ctx.lineWidth=1;ctx.setLineDash([5,3]);
-    ctx.beginPath();ctx.moveTo(c1.x,c1.y);ctx.lineTo(c2.x,c2.y);ctx.stroke();
-    ctx.setLineDash([]);ctx.globalAlpha=1;
-
-    // EPA badge extending off right edge
-    var badgeX=c2.x+6,badgeY=c2.y;
-    var badgeTxt='EPA '+epa.toFixed(2)+' '+dUnit();
-    ctx.font='bold 9px sans-serif';
-    var tw=ctx.measureText(badgeTxt).width;
-    var badgeW=tw+22,badgeH=18,badgeR=4;
-    var bx=badgeX,by=badgeY-badgeH/2;
-    ctx.globalAlpha=0.92;ctx.fillStyle='#1a1200';
-    ctx.beginPath();
-    ctx.moveTo(bx+badgeR,by);ctx.lineTo(bx+badgeW-badgeR,by);
-    ctx.arcTo(bx+badgeW,by,bx+badgeW,by+badgeR,badgeR);
-    ctx.lineTo(bx+badgeW,by+badgeH-badgeR);
-    ctx.arcTo(bx+badgeW,by+badgeH,bx+badgeW-badgeR,by+badgeH,badgeR);
-    ctx.lineTo(bx+badgeR,by+badgeH);
-    ctx.arcTo(bx,by+badgeH,bx,by+badgeH-badgeR,badgeR);
-    ctx.lineTo(bx,by+badgeR);
-    ctx.arcTo(bx,by,bx+badgeR,by,badgeR);
-    ctx.closePath();ctx.fill();
-    ctx.globalAlpha=0.8;ctx.strokeStyle='#facc15';ctx.lineWidth=1;ctx.stroke();
-    ctx.globalAlpha=1;ctx.fillStyle='#facc15';ctx.textAlign='left';
-    ctx.fillText(badgeTxt,bx+6,by+12);
-    var ix=bx+badgeW-13,iy=by+9;
-    ctx.beginPath();ctx.arc(ix,iy,6,0,Math.PI*2);
-    ctx.fillStyle='#facc15';ctx.globalAlpha=0.2;ctx.fill();
-    ctx.globalAlpha=1;ctx.strokeStyle='#facc15';ctx.lineWidth=1;ctx.stroke();
-    ctx.fillStyle='#facc15';ctx.font='bold 8px sans-serif';ctx.textAlign='center';
-    ctx.fillText('?',ix,iy+3);
-    ctx.restore();
-    canvas._epaZone={x:bx,y:by,w:badgeW,h:badgeH,epa:epa};
+  // Grid lines
+  var gridStep=50;
+  ctx.strokeStyle='rgba(255,255,255,0.04)';ctx.lineWidth=1;ctx.setLineDash([3,4]);
+  for(var gv=0;gv<=maxVal;gv+=gridStep){
+    var gy=PT+ch-gv*scY;
+    ctx.beginPath();ctx.moveTo(PL,gy);ctx.lineTo(PL+cw,gy);ctx.stroke();
+    if(gv%100===0){
+      ctx.setLineDash([]);
+      ctx.fillStyle='rgba(120,160,200,0.5)';ctx.font='10px "DM Mono",monospace';ctx.textAlign='right';
+      var gvDisp=METRIC?gv:Math.round(gv/1.60934);
+      ctx.fillText(gvDisp,PL-8,gy+4);
+      ctx.setLineDash([3,4]);
+    }
   }
+  ctx.setLineDash([]);
 
-  canvas._zones=[];
+  // Y axis label
+  ctx.save();ctx.translate(14,PT+ch/2);ctx.rotate(-Math.PI/2);
+  ctx.fillStyle='rgba(100,140,180,0.6)';ctx.font='10px "Space Grotesk",sans-serif';ctx.textAlign='center';
+  ctx.fillText(METRIC?'Range (km)':'Range (mi)',0,0);ctx.restore();
+
+  // Running position for waterfall
+  var runTop=data.baseKm; // current top of the stack (in km units)
 
   for(var i=0;i<n;i++){
-    var curEff=ANIM.curH[i];
-    var baseEff=ANIM.baseH[i];
-    var curClamped=Math.max(yMn,Math.min(yMx,curEff));
-    var baseClamped=Math.max(yMn,Math.min(yMx,baseEff));
-    var curH=(curClamped-yMn)*scY;
-    var baseH=(baseClamped-yMn)*scY;
-    var col=barCol(curEff,epa);
-    var x0=i*slotW+gap,x1=x0+bw,xm=x0+bw/2;
-    var isAtBase=Math.abs(curEff-baseEff)<0.005;
+    var bar=bars[i];
+    var x=PL+i*slotW+gap;
+    var bh,by;
 
-    // ── GHOST BAR (base case outline) ──
-    if(!isAtBase&&baseH>2){
-      var gs='rgba(160,185,210,0.65)';
-      var gf='rgba(100,130,160,0.07)';
-
-      // ghost right face
-      var grbl=fx(x1,0),grtl=fx(x1,baseH),grtb=bk(x1,baseH),grbb=bk(x1,0);
-      ctx.beginPath();ctx.moveTo(grbl.x,grbl.y);ctx.lineTo(grtl.x,grtl.y);
-      ctx.lineTo(grtb.x,grtb.y);ctx.lineTo(grbb.x,grbb.y);ctx.closePath();
-      ctx.fillStyle=gf;ctx.fill();ctx.strokeStyle=gs;ctx.lineWidth=1.2;ctx.stroke();
-
-      // ghost top face
-      var gtfl=fx(x0,baseH),gtfr=fx(x1,baseH),gtbr=bk(x1,baseH),gtbl=bk(x0,baseH);
-      ctx.beginPath();ctx.moveTo(gtfl.x,gtfl.y);ctx.lineTo(gtfr.x,gtfr.y);
-      ctx.lineTo(gtbr.x,gtbr.y);ctx.lineTo(gtbl.x,gtbl.y);ctx.closePath();
-      ctx.fillStyle='rgba(160,185,210,0.13)';ctx.fill();ctx.strokeStyle=gs;ctx.lineWidth=1.2;ctx.stroke();
-
-      // ghost front face
-      var gfbl=fx(x0,0),gftl=fx(x0,baseH),gftr=fx(x1,baseH),gfbr=fx(x1,0);
-      ctx.beginPath();ctx.moveTo(gfbl.x,gfbl.y);ctx.lineTo(gftl.x,gftl.y);
-      ctx.lineTo(gftr.x,gftr.y);ctx.lineTo(gfbr.x,gfbr.y);ctx.closePath();
-      ctx.fillStyle=gf;ctx.fill();ctx.strokeStyle=gs;ctx.lineWidth=1.2;ctx.stroke();
-
-      // penalty fill (only when current < base)
-      if(curEff<baseEff&&curH>0){
-        var pfbl=fx(x0,curH),pftl=fx(x0,baseH),pftr=fx(x1,baseH),pfbr=fx(x1,curH);
-        ctx.beginPath();ctx.moveTo(pfbl.x,pfbl.y);ctx.lineTo(pftl.x,pftl.y);
-        ctx.lineTo(pftr.x,pftr.y);ctx.lineTo(pfbr.x,pfbr.y);ctx.closePath();
-        ctx.fillStyle='rgba(239,68,68,0.15)';ctx.fill();
-        // subtle dashed top edge on penalty zone
-        ctx.setLineDash([3,3]);ctx.strokeStyle='rgba(239,68,68,0.35)';ctx.lineWidth=0.8;
-        ctx.beginPath();ctx.moveTo(pfbl.x,pfbl.y);ctx.lineTo(pfbr.x,pfbr.y);ctx.stroke();
-        ctx.setLineDash([]);
-      }
-
-      // ghost base label (floating above ghost top)
-      var glp=fx(xm,baseH);
-      ctx.fillStyle='rgba(160,185,210,0.75)';ctx.font='9px '+'"DM Mono",ui-monospace,monospace';ctx.textAlign='center';
-      ctx.fillText(baseEff.toFixed(2),glp.x,glp.y-(curEff<baseEff?17:6));
+    if(bar.isAnchor){
+      // Anchor bars sit on baseline
+      bh=bar.km*scY;
+      by=PT+ch-bh;
+    } else {
+      // Floating loss bar: starts at runTop, goes down by bar.km
+      bh=bar.km*scY;
+      by=PT+ch-runTop*scY;
+      runTop-=bar.km;
     }
 
-    // ── SOLID BAR (current) ──
-    // right face
-    var rbl=fx(x1,0),rtl=fx(x1,curH),rtb=bk(x1,curH),rbb=bk(x1,0);
-    ctx.beginPath();ctx.moveTo(rbl.x,rbl.y);ctx.lineTo(rtl.x,rtl.y);
-    ctx.lineTo(rtb.x,rtb.y);ctx.lineTo(rbb.x,rbb.y);ctx.closePath();
-    ctx.fillStyle=shd(col,0.52);ctx.fill();ctx.strokeStyle=shd(col,0.35);ctx.lineWidth=0.5;ctx.stroke();
-    // top face
-    var tfl=fx(x0,curH),tfr=fx(x1,curH),tbr=bk(x1,curH),tbl2=bk(x0,curH);
-    ctx.beginPath();ctx.moveTo(tfl.x,tfl.y);ctx.lineTo(tfr.x,tfr.y);
-    ctx.lineTo(tbr.x,tbr.y);ctx.lineTo(tbl2.x,tbl2.y);ctx.closePath();
-    ctx.fillStyle=shd(col,1.28);ctx.fill();ctx.strokeStyle=shd(col,0.8);ctx.lineWidth=0.5;ctx.stroke();
-    // front face
-    var fbl=fx(x0,0),ftl=fx(x0,curH),ftr=fx(x1,curH),fbr=fx(x1,0);
-    ctx.beginPath();ctx.moveTo(fbl.x,fbl.y);ctx.lineTo(ftl.x,ftl.y);
-    ctx.lineTo(ftr.x,ftr.y);ctx.lineTo(fbr.x,fbr.y);ctx.closePath();
-    ctx.fillStyle=col;ctx.fill();ctx.strokeStyle=shd(col,0.6);ctx.lineWidth=0.5;ctx.stroke();
+    // Clamp
+    bh=Math.max(2,bh);
 
-    // value label
-    if(curH>12){
-      var lp=fx(xm,curH);
-      ctx.fillStyle='#f1f5f9';ctx.font='bold 10px "DM Mono",ui-monospace,monospace';ctx.textAlign='center';
-      ctx.fillText(curEff.toFixed(2),lp.x,lp.y-6);
+    // Draw bar with gradient
+    var grad=ctx.createLinearGradient(x,by,x,by+bh);
+    grad.addColorStop(0,bar.color+'ff');
+    grad.addColorStop(1,bar.color+'88');
+    ctx.fillStyle=grad;
+
+    // Rounded top corners
+    var r=5;
+    ctx.beginPath();
+    ctx.moveTo(x+r,by);
+    ctx.lineTo(x+bw-r,by);
+    ctx.arcTo(x+bw,by,x+bw,by+r,r);
+    ctx.lineTo(x+bw,by+bh);
+    ctx.lineTo(x,by+bh);
+    ctx.lineTo(x,by+r);
+    ctx.arcTo(x,by,x+r,by,r);
+    ctx.closePath();
+    ctx.fill();
+
+    // Subtle border
+    ctx.strokeStyle=bar.color+'55';ctx.lineWidth=1;ctx.stroke();
+
+    // Glow effect for anchor bars
+    if(bar.isAnchor){
+      ctx.shadowColor=bar.color;ctx.shadowBlur=20;
+      ctx.fill();ctx.shadowBlur=0;
     }
 
-    // speed label
-    var xp=fx(xm,0);
-    ctx.fillStyle='#94a3b8';ctx.font='10px sans-serif';ctx.textAlign='center';
-    ctx.fillText(ST.metric?Math.round(mToK(SPEEDS[i])):SPEEDS[i],xp.x,xp.y+16);
-
-    canvas._zones.push({cx:fx(xm,0).x,mph:SPEEDS[i],eff:curEff,baseEff:baseEff,col:col});
-  }
-
-  // x axis label
-  ctx.fillStyle='#64748b';ctx.font='10px sans-serif';ctx.textAlign='center';
-  ctx.fillText(ST.metric?'Speed (km/h)':'Speed (mph)',ox+plotW/2,H-5);
-
-  // legend
-  var kits=[
-    {c:'#22c55e',l:'>5% above EPA'},{c:'#86efac',l:'0–5% above EPA'},
-    {c:'#facc15',l:'within 5% below'},{c:'#f97316',l:'5–15% below'},{c:'#ef4444',l:'>15% below EPA'}
-  ];
-  var kx=PL,ky=13;ctx.font='9px sans-serif';ctx.textAlign='left';
-  kits.forEach(function(ki){
-    ctx.fillStyle=ki.c;ctx.fillRect(kx,ky-8,9,8);
-    ctx.fillStyle='#64748b';ctx.fillText(ki.l,kx+12,ky-1);
-    kx+=ctx.measureText(ki.l).width+26;
-    if(kx>W-90){kx=PL;ky+=12;}
-  });
-
-  updateDeltaStrip();
-}
-
-// ================================================================
-// DELTA STRIP
-// ================================================================
-function updateDeltaStrip(){
-  var strip=$id('delta-strip');if(!strip)return;
-  var epa=epaEff(ST.dt);
-  var c=CFG[ST.dt];
-  SPEEDS.forEach(function(mph,i){
-    var cur=ANIM.curH[i],base=ANIM.baseH[i];
-    var delta=cur-base,pct=base>0?(delta/base*100):0;
-    var col=barCol(cur,epa);
-    var dCol=delta>0.005?'#22c55e':delta<-0.005?'#f87171':'#94a3b8';
-    var box=$id('dbox-'+i);if(!box)return;
-    box.querySelector('.dbox-eff').textContent=dEff(cur);
-    box.querySelector('.dbox-eff').style.color=col;
-    var rangeVal=Math.round((ST.metric?cur/1.60934:cur)*(c.pack*(ST.soh/100)));
-    box.querySelector('.dbox-range').textContent='🔋 ~'+dRange(rangeVal);
-    var dEl=box.querySelector('.dbox-delta');
-    if(Math.abs(delta)<0.005){
-      dEl.textContent='= Base';dEl.style.color='#475569';
-    }else{
-      var miLoss=Math.round(Math.abs(delta/epa)*c.pack);
-      dEl.textContent=(delta>=0?'+':'')+dEff(delta)+' ('+( pct>=0?'+':'')+pct.toFixed(1)+'%)';
-      dEl.style.color=dCol;
-      var miEl=box.querySelector('.dbox-mi');
-      if(miEl){
-        if(Math.abs(delta)>0.01){
-          miEl.textContent=(delta>=0?'+':'-')+dRange(miLoss)+' range';
-          miEl.style.color=dCol;
-        }else{miEl.textContent='';}
-      }
+    // Connector line to next bar (for loss bars)
+    if(!bar.isAnchor&&i<n-1&&!bars[i+1].isAnchor){
+      var nextX=PL+(i+1)*slotW+gap;
+      ctx.strokeStyle='rgba(255,255,255,0.12)';ctx.lineWidth=1;ctx.setLineDash([4,3]);
+      ctx.beginPath();ctx.moveTo(x+bw,by+bh);ctx.lineTo(nextX,by+bh);ctx.stroke();
+      ctx.setLineDash([]);
     }
-  });
-}
 
-// ================================================================
-// SCENARIO ACTIVATION
-// ================================================================
-function activateScenario(key, animate){
-  var sc=SCENARIOS.filter(function(s){return s.key===key;})[0];
-  if(!sc)return;
-  ST.activeScenario=key;
-  ST.isCustom=false;
-  track('scenario_click', key);
+    // Value label on bar
+    var labelY=by-8;
+    ctx.fillStyle='#fff';ctx.font='bold 11px "DM Mono",monospace';ctx.textAlign='center';
+    var labelTxt=(bar.isLoss?'-':'')+(METRIC?bar.km:Math.round(bar.km/1.60934))+(METRIC?' km':' mi');
+    ctx.fillText(labelTxt,x+bw/2,labelY);
 
-  // apply params to state
-  Object.assign(ST,sc.params);
+    // Emoji
+    ctx.font='16px serif';ctx.textAlign='center';
+    ctx.fillText(bar.emoji,x+bw/2,by+bh/2+(bh>30?8:4));
 
-  // update scenario button active states
-  document.querySelectorAll('.sc-btn').forEach(function(b){
-    b.classList.toggle('active',b.dataset.key===key);
-  });
+    // X label
+    ctx.fillStyle='rgba(120,160,200,0.7)';ctx.font='10px "Space Grotesk",sans-serif';ctx.textAlign='center';
+    var lw=bw+4;
+    ctx.save();
+    // Clip label to reasonable width
+    var words=bar.label.split(' ');
+    var line1=words[0],line2=words.slice(1).join(' ');
+    ctx.fillText(line1,x+bw/2,PT+ch+18);
+    if(line2)ctx.fillText(line2,x+bw/2,PT+ch+30);
+    ctx.restore();
 
-  // hide custom pill
-  var cp=$id('custom-pill');if(cp)cp.style.display='none';
-
-  // recompute targets
-  var newEffs=SPEEDS.map(function(mph){
-    var r=c6(mph,ST.ambientT,ST.dt);
-    return ST.metric?+(r.eff*1.60934).toFixed(3):+r.eff.toFixed(3);
-  });
-
-  if(animate!==false){
-    animateTo(newEffs,ST.ambientT);
-  }else{
-    ANIM.curH=newEffs.slice();
-    ANIM.tempCur=ST.ambientT;
-    updateTempSliderVisual(ST.ambientT);
-    drawChart();
+    // Store zone for hover
+    WF_ZONES.push({x:x,y:by,w:bw,h:bh,bar:bar});
   }
 
-  // rebuild advanced panel from current ST if it's open
-  if(ST.advOpen){
-    var advInner=document.querySelector('.adv-inner');
-    if(advInner)buildAdvancedPanel(advInner);
-  }
-  updateConditionsLine();
-}
-
-function markCustom(){
-  if(!ST.isCustom){
-    ST.isCustom=true;
-    ST.activeScenario='';
-    document.querySelectorAll('.sc-btn').forEach(function(b){b.classList.remove('active');});
-    var cp=$id('custom-pill');if(cp)cp.style.display='inline-block';
-  }
-}
-
-function recomputeAndAnimate(){
-  var newEffs=SPEEDS.map(function(mph){
-    var r=c6(mph,ST.ambientT,ST.dt);
-    return ST.metric?+(r.eff*1.60934).toFixed(3):+r.eff.toFixed(3);
-  });
-  animateTo(newEffs,ST.ambientT);
-  updateConditionsLine();
-  updateQuickBoxes();
-  try{if(window.history&&window.history.replaceState)window.history.replaceState(null,'',encodeState());}catch(e){}
-}
-
-function updateConditionsLine(){
-  var el2=$id('chart-cond');if(!el2)return;
-  var tl={cruise:'🛣️ Steady Cruise',mixed:'🚙 Mixed Flow',stopgo:'🛑 Stop-and-Go'};
-  var sl={none:'☁️ No sun',partial:'⛅ Partly',full:'☀️ Full sun'};
-  el2.textContent='🌡️ Cabin '+dTemp(ST.cabinT)+' | 💨 '+dWind(ST.wind)+' | ⛰️ '+dGrade(ST.grade)+' | '+tl[ST.traffic]+' | '+sl[ST.solar];
+  // Baseline
+  ctx.strokeStyle='rgba(59,158,255,0.2)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(PL,PT+ch);ctx.lineTo(PL+cw,PT+ch);ctx.stroke();
 }
 
 // ================================================================
-// ADVANCED PANEL SYNC
+// TOOLTIP
 // ================================================================
-var advSliderRefs={};
+var wfCanvas=null;
+function initTooltip(){
+  wfCanvas=document.getElementById('wf');
+  var tip=document.getElementById('wf-tip');
 
-function syncAdvancedPanel(){
-  // update any slider DOM elements that exist
-  Object.keys(advSliderRefs).forEach(function(k){
-    var ref=advSliderRefs[k];
-    if(ref&&ref.inp&&ref.lv&&ref.upd){
-      var raw=ST[k];
-      var disp=ref.toDisp?ref.toDisp(raw):raw;
-      ref.inp.value=disp;
-      ref.upd(disp);
+  // Track which bar is currently pinned open
+  var pinnedZone = null;
+
+  function showTip(hit, ev, r){
+    var tipKmVal = hit.bar.tip.km || '';
+    var tipRaw = tipKmVal.replace(/[^0-9]/g,'');
+    var tipSign = tipKmVal.charAt(0)==='-'?'-':tipKmVal.charAt(0)==='+'?'+':'';
+    if(tipRaw && !METRIC){
+      tipKmVal = tipSign+Math.round(parseInt(tipRaw)/1.60934)+' mi';
+    } else if(tipRaw && METRIC){
+      tipKmVal = tipSign+tipRaw+' km';
     }
-  });
-  // toggles
-  ['seat','whl','defrost','roof'].forEach(function(k){
-    var tr=$id('tog-'+k);if(!tr)return;
-    var th=tr.querySelector('.tthumb');
-    var on=ST[k];
-    tr.style.background=on?'#2563eb':'#334155';
-    if(th)th.style.left=on?'20px':'3px';
-  });
-  var hld=$id('hld');
-  if(hld){var w=(ST.seat?140:0)+(ST.whl?25:0)+(ST.defrost?250:0);hld.textContent='🔌 Heaters: '+(w>0?w+'W':'none');}
-}
-
-// ================================================================
-// BUILD APP
-// ================================================================
-var app=$id('app'),viewBtns={},tabContent,quickBoxes=[];
-var fwdBtn,awdBtn,unitBtns={};
-
-function buildApp(){
-  // ── HEADER ──
-  var hdr=el('div',{style:{borderBottom:'1px solid #1e293b',paddingBottom:'10px',marginBottom:'9px',
-    display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:'8px'}});
-  var hl=el('div',{style:{display:'flex',alignItems:'center',gap:'9px'}});
-  hl.appendChild(el('a',{href:'/',style:{fontSize:'10px',color:'#334155',textDecoration:'none',fontFamily:"var(--mono)",letterSpacing:'.05em',marginRight:'4px',transition:'color .15s',onmouseover:"this.style.color='#64748b'",onmouseout:"this.style.color='#334155'"}},'← Home'));
-  hl.appendChild(el('span',{style:{background:'#1d4ed8',color:'#fff',padding:'2px 8px',borderRadius:'4px',fontSize:'9px',fontWeight:'800',letterSpacing:'.05em'}},'EE v8'));
-  var ti=el('div',null);
-  ti.appendChild(el('div',{style:{fontSize:'16px',fontWeight:'800',color:'#fff',letterSpacing:'-.01em'}},'Chevrolet Equinox EV — Efficiency Calculator'));
-  ti.appendChild(el('div',{style:{fontSize:'10px',color:'#90EE90',marginTop:'2px'}},'Physics-based | 2024–2026 | FWD & AWD | Imperial & Metric'));
-  hl.appendChild(ti);
-  var tbr=el('div',{style:{display:'flex',gap:'4px',flexWrap:'wrap',alignItems:'center'}});
-  var cpBtn=el('button',{class:'btn boff',style:{fontSize:'10px',padding:'5px 10px'}},'Share Link');
-  cpBtn.id='copy-btn';cpBtn.addEventListener('click',copyPermalink);tbr.appendChild(cpBtn);
-  tbr.appendChild(el('div',{style:{width:'1px',height:'20px',background:'#1e293b'}}));
-  [['chart','Chart'],['breakdown','Breakdown'],['table','Table'],['model','Model']].forEach(function(tb){
-    var b=el('button',{class:'btn '+(ST.view===tb[0]?'bon':'boff')},tb[1]);
-    b.addEventListener('click',function(){ST.view=tb[0];track('tab_view',tb[0]);setView(tb[0]);});
-    viewBtns[tb[0]]=b;tbr.appendChild(b);
-  });
-  hdr.appendChild(hl);hdr.appendChild(tbr);app.appendChild(hdr);
-
-  // ── TOP BAR: drivetrain + units ──
-  var topbar=el('div',{class:'topbar'});
-  topbar.appendChild(el('span',{style:{fontSize:'10px',color:'#64748b',fontWeight:'700',marginRight:'2px'}},'DRIVETRAIN:'));
-  fwdBtn=el('button',{class:'dt-btn dt-fwd'});
-  fwdBtn.innerHTML="⚡ FWD <span style='font-size:9px;opacity:.75'>Single Motor 108 MPGe · 319mi EPA</span>";
-  fwdBtn.addEventListener('click',function(){ST.dt='fwd';track('drivetrain_click','fwd');updDT();recomputeAndAnimate();});
-  awdBtn=el('button',{class:'dt-btn dt-off'});
-  awdBtn.innerHTML="⚡⚡ AWD <span style='font-size:9px;opacity:.75'>Dual Motor 96 MPGe 307mi</span>";
-  awdBtn.addEventListener('click',function(){ST.dt='awd';track('drivetrain_click','awd');updDT();recomputeAndAnimate();});
-  topbar.appendChild(fwdBtn);topbar.appendChild(awdBtn);
-  topbar.appendChild(el('div',{class:'sep'}));
-  topbar.appendChild(el('span',{style:{fontSize:'10px',color:'#64748b',fontWeight:'700',marginRight:'2px'}},'UNITS:'));
-  var uiB=el('button',{class:'unit-btn '+(ST.metric?'boff':'bon')},'🇺🇸 Imperial');
-  var umB=el('button',{class:'unit-btn '+(ST.metric?'bon':'boff')},'🌍 Metric');
-  uiB.addEventListener('click',function(){ST.metric=false;track('unit_switch','imperial');uiB.className='unit-btn bon';umB.className='unit-btn boff';try{localStorage.setItem('equinox_metric','0');}catch(e){}rebuildAll();});
-  umB.addEventListener('click',function(){ST.metric=true;track('unit_switch','metric');uiB.className='unit-btn boff';umB.className='unit-btn bon';try{localStorage.setItem('equinox_metric','1');}catch(e){}rebuildAll();});
-  unitBtns.imp=uiB;unitBtns.met=umB;
-  topbar.appendChild(uiB);topbar.appendChild(umB);
-  var epaEl=el('div',{class:'mono',style:{fontSize:'9px',color:'#64748b',marginLeft:'auto'}});
-  epaEl.id='epa-el';topbar.appendChild(epaEl);
-  app.appendChild(topbar);
-
-  // ── SCENARIO STRIP ──
-  var scWrap=el('div',{class:'sc-wrap'});
-  var scTitle=el('div',{class:'sc-title'});
-  scTitle.innerHTML='🎯 Real-World Scenarios <span id="custom-pill" class="custom-pill" style="display:none">✏️ Custom</span>';
-  scWrap.appendChild(scTitle);
-  var scGrid=el('div',{class:'sc-grid'});
-  SCENARIOS.forEach(function(sc){
-    var btn=el('button',{class:'sc-btn'+(sc.key===ST.activeScenario?' active':'')});
-    btn.dataset.key=sc.key;
-    btn.innerHTML='<span class="sc-icon">'+sc.icon+'</span>'+
-      '<span class="sc-name">'+sc.name+'</span>'+
-      '<span class="sc-sub">'+sc.sub+'</span>'+
-      '<span class="sc-badge '+sc.badgeClass+'">'+sc.badge+'</span>';
-    btn.addEventListener('click',function(){activateScenario(sc.key,true);});
-    scGrid.appendChild(btn);
-  });
-  scWrap.appendChild(scGrid);
-  app.appendChild(scWrap);
-
-  // ── ADVANCED PANEL (just below scenarios) ──
-  var advWrap=el('div',{class:'adv-wrap'});
-  var advToggle=el('button',{class:'adv-toggle'});
-  var advLeft=el('div',{class:'adv-toggle-left'});
-  advLeft.appendChild(el('span',{class:'adv-toggle-icon'},'🔧'));
-  var advTxt=el('div',null);
-  advTxt.appendChild(el('div',{class:'adv-toggle-text'},'Adjust Conditions'));
-  advTxt.appendChild(el('div',{class:'adv-toggle-sub'},'Fine-tune wind, grade, load, HVAC and more'));
-  advLeft.appendChild(advTxt);
-  var advChev=el('span',{class:'adv-chevron'+(ST.advOpen?' open':'')});
-  advChev.textContent='⌄';
-  advToggle.appendChild(advLeft);advToggle.appendChild(advChev);
-  var advBody=el('div',{class:'adv-body'+(ST.advOpen?' open':'')});
-  var advInner=el('div',{class:'adv-inner'});
-  advBody.appendChild(advInner);
-  advToggle.addEventListener('click',function(){
-    ST.advOpen=!ST.advOpen;
-    advBody.className='adv-body'+(ST.advOpen?' open':'');
-    advChev.className='adv-chevron'+(ST.advOpen?' open':'');
-    if(ST.advOpen)buildAdvancedPanel(advInner);
-  });
-  advWrap.appendChild(advToggle);advWrap.appendChild(advBody);
-  app.appendChild(advWrap);
-
-  // if was open from permalink, build it immediately from current ST
-  if(ST.advOpen)buildAdvancedPanel(advInner);
-
-  // ── TEMPERATURE SLIDER (always visible) ──
-  var tempPanel=el('div',{class:'temp-panel'});
-  var tempHdr=el('div',{class:'temp-header'});
-  tempHdr.appendChild(el('span',{class:'temp-label'},'🌡️ Outside Temperature'));
-  var tempVal=el('span',{class:'temp-value',id:'temp-val'},dTemp(ST.ambientT));
-  tempHdr.appendChild(tempVal);
-  tempPanel.appendChild(tempHdr);
-  var tempInp=el('input',{type:'range',min:0,max:100,step:10,value:ST.ambientT,id:'temp-inp'});
-  tempInp.style.height='8px';
-  tempInp.addEventListener('input',function(){
-    ST.ambientT=+tempInp.value;
-    markCustom();
-    updateTempSliderVisual(ST.ambientT);
-    ANIM.tempCur=ST.ambientT;
-    ANIM.tempTgt=ST.ambientT;
-    recomputeAndAnimate();
-  });
-  tempInp.addEventListener('change',function(){
-    track('temp_set', String(ST.ambientT));
-  });
-  tempPanel.appendChild(tempInp);
-  var TICK_TEMPS=[0,10,20,30,40,50,60,70,80,90,100];
-  var tickRow=el('div',{class:'temp-ticks'});
-  TICK_TEMPS.forEach(function(t){
-    var tk=el('span',{class:'temp-tick',style:{color:t===ST.ambientT?'#60a5fa':'#475569',fontWeight:t===ST.ambientT?'700':'400'}},dTemp(t));
-    tickRow.appendChild(tk);
-  });
-  tempPanel.appendChild(tickRow);
-  app.appendChild(tempPanel);
-
-  // ── TAB CONTENT ──
-  tabContent=el('div',null);app.appendChild(tabContent);
-
-  // ── QUICK BOXES ──
-  var qg=el('div',{class:'qgrid'});qg.id='qg';app.appendChild(qg);buildQuick(qg);
-
-  // ── FOOTER ──
-  app.appendChild(el('div',{style:{marginTop:'10px',textAlign:'center',fontSize:'9px',color:'#90EE90',paddingBottom:'14px'}},
-    'Equinox EV Efficiency Model | Physics-based educational tool | 2024–2026 | created by gazunni'),el('div',{style:{marginTop:'5px',fontSize:'8px',color:'#334155',maxWidth:'700px',margin:'5px auto 0',lineHeight:'1.6',textAlign:'center'}},
-    'Physics-based educational tool. Results are modelled estimates for informational purposes only — not for trip planning or safety-critical decisions. Real-world range varies with driving behaviour, vehicle condition, and factors not captured in this model. Not affiliated with or endorsed by General Motors Corporation.'));
-
-  updDT();updateEpaLabel();
-
-  // compute base heights once
-  ANIM.baseH=getBaseEffs();
-
-  // init with January Commute (no animation on first load, then animate in)
-  var initEffs=SPEEDS.map(function(mph){
-    var r=calcI(mph,ST.ambientT,ST.dt,ST.cabinT,ST.seat,ST.whl,ST.defrost,
-               ST.wind,ST.pax,ST.cargo,ST.roof,ST.psi,ST.grade,ST.traffic,ST.solar,ST.alt,ST.soh);
-    return ST.metric?+(r.eff*1.60934).toFixed(3):+r.eff.toFixed(3);
-  });
-
-  // start from base case visually, then animate to scenario
-  ANIM.curH=ANIM.baseH.slice();
-  ANIM.tempCur=BASE_CASE.ambientT;
-  updateTempSliderVisual(BASE_CASE.ambientT);
-
-  setView(ST.view);
-  updateConditionsLine();
-  updateEpaLabel();
-
-  // delay opening animation so DOM is settled
-  setTimeout(function(){
-    activateScenario(ST.activeScenario||'jan_commute',true);
-  },350);
-}
-
-function updDT(){
-  if(fwdBtn)fwdBtn.className='dt-btn '+(ST.dt==='fwd'?'dt-fwd':'dt-off');
-  if(awdBtn)awdBtn.className='dt-btn '+(ST.dt==='awd'?'dt-awd':'dt-off');
-  // recompute base heights for this drivetrain
-  ANIM.baseH=getBaseEffs();
-}
-
-function updateEpaLabel(){
-  var ep=$id('epa-el');
-  if(ep){var c=CFG[ST.dt];var weff=(c.mpge/33.705);var weffD=ST.metric?(weff*1.60934).toFixed(3):weff.toFixed(3);ep.textContent=c.label+' | EPA '+c.epa_mi+' mi | '+c.mpge+' MPGe | '+weffD+' '+dUnit()+' wall-to-wheels';}
-}
-
-// ================================================================
-// ADVANCED PANEL BUILD
-// ================================================================
-function buildAdvancedPanel(wrap){
-  wrap.innerHTML='';
-  advSliderRefs={};
-  var sgrid=el('div',{class:'sgrid'});
-
-  // Section 1: Cabin & Wind
-  var s1=el('div',{class:'sec'});
-  s1.appendChild(mkLbl('#60a5fa','🌡️ Cabin & Wind'));
-  var cabMin=ST.metric?16:60,cabMax=ST.metric?30:85;
-  var cabVal=ST.metric?Math.round(fToC(ST.cabinT)*2)/2:ST.cabinT;
-  var cabSlider=mkSlider({label:'Cabin Setpoint',emoji:'🌡️',value:cabVal,min:cabMin,max:cabMax,step:ST.metric?0.5:1,
-    unit:ST.metric?' C':' F',color:'#60a5fa',
-    onChange:function(v){ST.cabinT=ST.metric?cToF(v):v;markCustom();recomputeAndAnimate();}});
-  s1.appendChild(cabSlider);
-  var wVal=ST.metric?Math.round(mToK(ST.wind)):ST.wind;
-  s1.appendChild(mkSlider({label:'Headwind / Tailwind',emoji:'💨',value:wVal,
-    min:ST.metric?-32:-20,max:ST.metric?64:40,step:ST.metric?8:5,color:'#f87171',
-    fmt:function(v){if(v===0)return'Calm';return ST.metric?(v>0?'+':'')+v+' km/h':(v>0?'+'+v+' mph':v+' mph');},
-    onChange:function(v){ST.wind=ST.metric?kToM(v):v;markCustom();recomputeAndAnimate();}}));
-  sgrid.appendChild(s1);
-
-  // Section 2: Grade, Tires & Altitude
-  var s2=el('div',{class:'sec'});
-  s2.appendChild(mkLbl('#34d399','🛞 Grade, Tires & Altitude'));
-  s2.appendChild(mkSlider({label:'Road Grade',emoji:'⛰️',value:ST.grade,min:-6,max:8,step:0.5,color:'#34d399',
-    fmt:function(v){return v>0?'+'+v+'%':v<0?v+'%':'Level';},
-    onChange:function(v){ST.grade=v;markCustom();recomputeAndAnimate();}}));
-  s2.appendChild(mkSlider({label:'Tire Pressure',emoji:'🛞',value:ST.psi,min:20,max:50,step:1,unit:' PSI',
-    color:'#90EE90',sub:'Nominal 42 PSI',
-    onChange:function(v){ST.psi=v;markCustom();recomputeAndAnimate();}}));
-  var altVal=ST.metric?Math.round(ST.alt*0.3048):ST.alt;
-  s2.appendChild(mkSlider({label:'Altitude',emoji:'🏔️',value:altVal,min:0,max:ST.metric?2440:8000,
-    step:ST.metric?100:500,color:'#2dd4bf',
-    fmt:function(v){return ST.metric?v+'m':v+' ft';},
-    sub:'Denver=5280ft | thinner air = less drag',
-    onChange:function(v){ST.alt=ST.metric?Math.round(v/0.3048):v;markCustom();recomputeAndAnimate();}}));
-  sgrid.appendChild(s2);
-
-  // Section 3: Comfort Heaters
-  var s3=el('div',{class:'sec'});
-  s3.appendChild(mkLbl('#fbbf24','🔥 Comfort Heaters'));
-  function mkTog(label,emoji,sub,watts,stKey){
-    var t=mkToggle({label:label,emoji:emoji,sub:sub,watts:watts,value:ST[stKey],
-      onChange:function(v){ST[stKey]=v;markCustom();recomputeAndAnimate();}});
-    t.querySelector('.ttrack').id='tog-'+stKey;
-    return t;
+    document.getElementById('tip-title').textContent = hit.bar.tip.title;
+    document.getElementById('tip-km').textContent = tipKmVal;
+    document.getElementById('tip-km').style.color = hit.bar.color;
+    document.getElementById('tip-body').textContent = hit.bar.tip.body;
+    tip.style.display = 'block';
+    if(ev && r){
+      var tx = ev.clientX - r.left + 16;
+      if(tx + 290 > r.width) tx = ev.clientX - r.left - 295;
+      tip.style.left = Math.max(4,tx) + 'px';
+      tip.style.top = Math.max(4, ev.clientY - r.top - 60) + 'px';
+    }
+    // Add close hint if not already there
+    if(!document.getElementById('tip-close')){
+      var closeRow = document.createElement('div');
+      closeRow.id = 'tip-close';
+      closeRow.style.cssText = 'margin-top:10px;text-align:right;font-size:10px;color:#3d6080;font-family:var(--body);';
+      closeRow.textContent = 'click again to close';
+      tip.appendChild(closeRow);
+    }
   }
-  s3.appendChild(mkTog('Seat Heaters x2','🪑','140W resistive',140,'seat'));
-  s3.appendChild(mkTog('Steering Wheel','🎡','25W resistive',25,'whl'));
-  s3.appendChild(mkTog('Rear Defrost + Mirrors','🪟','~250W (auto-off ~10 min)',250,'defrost'));
-  var hld=el('div',{style:{fontSize:'9px',color:'#64748b',marginTop:'2px'}});hld.id='hld';s3.appendChild(hld);
-  var w=(ST.seat?140:0)+(ST.whl?25:0)+(ST.defrost?250:0);hld.textContent='🔌 Heaters: '+(w>0?w+'W':'none');
-  sgrid.appendChild(s3);
 
-  // Section 4: Load
-  var s4=el('div',{class:'sec'});
-  s4.appendChild(mkLbl('#a78bfa','📦 Load'));
-  s4.appendChild(mkSlider({label:'Occupants',emoji:'👥',value:ST.pax,min:1,max:5,step:1,color:'#a78bfa',
-    fmt:function(v){return v===1?'🧑 Solo':v===2?'👫 2 people':v===3?'👨‍👩‍👦 3 people':'👨‍👩‍👧‍👦 '+v+' people';},
-    onChange:function(v){ST.pax=v;markCustom();recomputeAndAnimate();}}));
-  var cgVal=ST.metric?Math.round(ST.cargo*0.4536):ST.cargo;
-  s4.appendChild(mkSlider({label:'Cargo',emoji:'🧳',value:cgVal,min:0,max:ST.metric?225:500,step:ST.metric?10:25,
-    unit:ST.metric?' kg':' lb',color:'#8b5cf6',
-    onChange:function(v){ST.cargo=ST.metric?v/0.4536:v;markCustom();recomputeAndAnimate();}}));
-  s4.appendChild(mkTog('Roof Cargo Box','📦','Cd+0.10, A+0.25m²',0,'roof'));
-  s4.appendChild(mkSlider({label:'Battery Health (SOH)',emoji:'🔋',value:ST.soh,min:80,max:100,step:1,unit:'%',
-    color:'#f59e0b',sub:'Affects range only, not mi/kWh',
-    fmt:function(v){return v===100?'100% (new)':v+'%';},
-    onChange:function(v){ST.soh=v;markCustom();recomputeAndAnimate();}}));
-  sgrid.appendChild(s4);
+  function hideTip(){
+    tip.style.display = 'none';
+    pinnedZone = null;
+  }
 
-  // Section 5: Traffic & Solar
-  var s5=el('div',{class:'sec'});
-  s5.appendChild(mkLbl('#f472b6','🚦 Traffic & Solar'));
-  s5.appendChild(el('div',{style:{fontSize:'9px',color:'#64748b',fontWeight:'700',marginBottom:'4px',textTransform:'uppercase',letterSpacing:'.05em'}},'🚗 Traffic Mode'));
-  var tmRow=el('div',{style:{display:'flex',gap:'4px',marginBottom:'8px'}});
-  [['cruise','🛣️ Cruise','#334155'],['mixed','🚙 Mixed','#854d0e'],['stopgo','🛑 Stop & Go','#7c2d12']].forEach(function(r){
-    var b=el('button',{style:{flex:'1',padding:'6px 4px',borderRadius:'5px',fontSize:'9px',fontWeight:'700',
-      border:'none',cursor:'pointer',lineHeight:'1.4',
-      background:ST.traffic===r[0]?r[2]:'#1e293b',color:ST.traffic===r[0]?'#fff':'#64748b'}},r[1]);
-    b.addEventListener('click',function(){
-      ST.traffic=r[0];markCustom();
-      tmRow.querySelectorAll('button').forEach(function(btn,i){
-        var m=[['cruise','#334155'],['mixed','#854d0e'],['stopgo','#7c2d12']];
-        btn.style.background=m[i][0]===r[0]?m[i][1]:'#1e293b';
-        btn.style.color=m[i][0]===r[0]?'#fff':'#64748b';
-      });
-      recomputeAndAnimate();
+  // HOVER — preview only when nothing is pinned
+  wfCanvas.addEventListener('mousemove', function(ev){
+    if(pinnedZone) return;
+    var r = wfCanvas.getBoundingClientRect();
+    var mx = ev.clientX - r.left, my = ev.clientY - r.top;
+    var hit = null;
+    WF_ZONES.forEach(function(z){
+      if(mx>=z.x&&mx<=z.x+z.w&&my>=z.y&&my<=z.y+z.h) hit=z;
     });
-    tmRow.appendChild(b);
-  });
-  s5.appendChild(tmRow);
-  s5.appendChild(el('div',{style:{fontSize:'8px',color:'#90EE90',marginBottom:'8px',lineHeight:'1.5'}},
-    'Scales HVAC cost per mile by avg speed. Traction power unchanged.'));
-  s5.appendChild(el('div',{style:{fontSize:'9px',color:'#64748b',fontWeight:'700',marginBottom:'4px',textTransform:'uppercase',letterSpacing:'.05em'}},'☀️ Solar Gain (A/C only)'));
-  var solRow=el('div',{style:{display:'flex',gap:'4px',marginBottom:'6px'}});
-  [['none','☁️ No Sun','#334155'],['partial','⛅ Partly','#78350f'],['full','☀️ Full Sun','#92400e']].forEach(function(r){
-    var b=el('button',{style:{flex:'1',padding:'6px 4px',borderRadius:'5px',fontSize:'9px',fontWeight:'700',
-      border:'none',cursor:'pointer',lineHeight:'1.4',
-      background:ST.solar===r[0]?r[2]:'#1e293b',color:ST.solar===r[0]?'#fff':'#64748b'}},r[1]);
-    b.addEventListener('click',function(){
-      ST.solar=r[0];markCustom();
-      solRow.querySelectorAll('button').forEach(function(btn,i){
-        var s=[['none','#334155'],['partial','#78350f'],['full','#92400e']];
-        btn.style.background=s[i][0]===r[0]?s[i][1]:'#1e293b';
-        btn.style.color=s[i][0]===r[0]?'#fff':'#64748b';
-      });
-      recomputeAndAnimate();
-    });
-    solRow.appendChild(b);
-  });
-  s5.appendChild(solRow);
-  s5.appendChild(el('div',{style:{fontSize:'8px',color:'#90EE90',lineHeight:'1.5'}},
-    '~500W through glass on sunny day. Only affects cooling (AC).'));
-  sgrid.appendChild(s5);
-
-  wrap.appendChild(sgrid);
-}
-
-// ================================================================
-// QUICK BOXES
-// ================================================================
-function buildQuick(wrap){
-  while(wrap.firstChild)wrap.removeChild(wrap.firstChild);
-  quickBoxes=[];
-  [[40,80],[60,60],[70,20],[80,0]].forEach(function(q){
-    var box=el('div',{class:'qbox'});
-    var v1=el('div',{class:'mono',style:{fontSize:'17px',fontWeight:'700'}});
-    var v2=el('div',{class:'mono',style:{fontSize:'11px',marginTop:'2px'}});
-    var ls=ST.metric?Math.round(mToK(q[0]))+'km/h':q[0]+'mph';
-    var lt=ST.metric?Math.round(fToC(q[1]))+'\u00b0C':q[1]+'\u00b0F';
-    box.appendChild(v1);box.appendChild(v2);
-    box.appendChild(el('div',{style:{fontSize:'9px',color:'#64748b',marginTop:'3px'}},ls+' / '+lt));
-    wrap.appendChild(box);
-    quickBoxes.push({v1:v1,v2:v2,mph:q[0],t:q[1]});
-  });
-  updateQuickBoxes();
-}
-
-function updateQuickBoxes(){
-  quickBoxes.forEach(function(q){
-    var p=calcI(q.mph,q.t,ST.dt,BASE_CASE.cabinT,false,false,false,0,1,0,false,42,0,'cruise','none',0,100);
-    var epa=epaEff(ST.dt);
-    var eff=ST.metric?p.eff*1.60934:p.eff;
-    q.v1.textContent=dEff(p.eff);q.v1.style.color=effCol(p.eff,ST.dt);
-    var pct=(eff-epa)/epa*100;
-    q.v2.textContent=(pct>=0?'+':'')+pct.toFixed(1)+'% EPA';
-    q.v2.style.color=pct>5?'#22c55e':pct>0?'#86efac':pct>-5?'#facc15':pct>-15?'#f97316':'#ef4444';
-  });
-}
-
-// ================================================================
-// VIEWS
-// ================================================================
-function setView(v){
-  Object.keys(viewBtns).forEach(function(k){viewBtns[k].className='btn '+(k===v?'bon':'boff');});
-  while(tabContent.firstChild)tabContent.removeChild(tabContent.firstChild);
-  if(v==='chart')bChart();
-  else if(v==='breakdown')bBd();
-  else if(v==='table')bTable();
-  else bModel();
-}
-
-function rebuildAll(){
-  // recompute base heights
-  ANIM.baseH=getBaseEffs();
-  // rebuild quick boxes
-  var qg=$id('qg');if(qg)buildQuick(qg);
-  // rebuild advanced panel if open
-  var advInner=document.querySelector('.adv-inner');
-  if(advInner&&ST.advOpen)buildAdvancedPanel(advInner);
-  // update temp ticks
-  var ticks=document.querySelectorAll('.temp-tick');
-  var TICK_TEMPS=[0,10,20,30,40,50,60,70,80,90,100];
-  ticks.forEach(function(tk,i){tk.textContent=dTemp(TICK_TEMPS[i]);});
-  updateTempSliderVisual(ST.ambientT);
-  updateEpaLabel();
-  recomputeAndAnimate();
-  setView(ST.view);
-}
-
-// ================================================================
-// CHART VIEW
-// ================================================================
-function bChart(){
-  var card=el('div',{class:'chart-card'});
-
-  var meta=el('div',{class:'chart-meta'});
-  var tl=el('div',null);
-  tl.appendChild(el('div',{class:'chart-title'},'📊 '+dUnit()+' vs Speed — '+ST.dt.toUpperCase()));
-  tl.appendChild(el('div',{class:'chart-hint'},'Modelled estimates · Solid bar = current · Ghost = Perfect Day base · Gap = penalty · Actual results vary'));
-  meta.appendChild(tl);
-  var cond=el('div',{class:'chart-conditions',id:'chart-cond'});
-  meta.appendChild(cond);
-  card.appendChild(meta);
-
-  var cwrap=el('div',{class:'cwrap'});
-  chartCanvas=document.createElement('canvas');
-  chartTip=el('div',{class:'tip'});
-  cwrap.appendChild(chartCanvas);cwrap.appendChild(chartTip);
-  card.appendChild(cwrap);
-
-  // delta strip skeleton
-  var ds=el('div',{class:'delta-strip',id:'delta-strip'});
-  SPEEDS.forEach(function(mph,i){
-    var box=el('div',{class:'dbox',id:'dbox-'+i});
-    box.appendChild(el('div',{class:'dbox-spd'},ST.metric?Math.round(mToK(mph))+' km/h':mph+' mph'));
-    box.appendChild(el('div',{class:'dbox-eff mono'},'—'));
-    box.appendChild(el('div',{class:'dbox-range mono'},''));
-    box.appendChild(el('div',{class:'dbox-delta mono'},''));
-    box.appendChild(el('div',{class:'dbox-mi'},''));
-    ds.appendChild(box);
-  });
-  card.appendChild(ds);
-  card.appendChild(el('div',{style:{fontSize:'8px',color:'#475569',marginTop:'6px',textAlign:'right',fontStyle:'italic'}},
-    '~ Modelled range estimates for educational purposes only. Actual range varies with driving conditions and vehicle state.'));
-  tabContent.appendChild(card);
-
-  // canvas events
-  chartCanvas.addEventListener('mousemove',function(ev){
-    if(!chartCanvas._zones)return;
-    var r=chartCanvas.getBoundingClientRect();
-    var mx=ev.clientX-r.left,my=ev.clientY-r.top;
-    var ez=chartCanvas._epaZone;
-    if(ez&&mx>=ez.x&&mx<=ez.x+ez.w&&my>=ez.y&&my<=ez.y+ez.h){
-      chartTip.innerHTML='<b style="color:#facc15">&#128202; EPA Reference Line</b><br><br>'+
-        '<span style="color:#94a3b8">GM combined rating: </span><b style="color:#facc15">'+ez.epa.toFixed(2)+' '+dUnit()+'</b><br><br>'+
-        '<span style="color:#cbd5e1">The EPA figure is a <b style="color:#fff">wall-to-wheels</b> measurement — energy drawn from your L2 charger, including charging losses (~20%). It reflects a standardized city/highway test cycle averaged together.</span><br><br>'+
-        '<span style="color:#cbd5e1">This app models efficiency at a <b style="color:#fff">specific operating point</b> — one speed, one temperature, one set of conditions. Steady highway cruising in mild weather will exceed the combined EPA rating, just as ICE highway MPG exceeds combined MPG.</span><br><br>'+
-        '<span style="color:#90EE90">The EPA line here uses the official wall-side figure (MPGe ÷ 33.705). Bars above the line beat EPA under those conditions.</span>';
-      chartTip.style.display='block';chartTip.style.maxWidth='280px';chartTip.style.lineHeight='1.7';
-      var tx=ez.x+ez.w+8;if(tx+290>r.width)tx=ez.x-295;
-      chartTip.style.left=tx+'px';chartTip.style.top=Math.max(4,ez.y-40)+'px';
-      chartCanvas.style.cursor='pointer';return;
+    if(hit){
+      showTip(hit, ev, r);
+      wfCanvas.style.cursor = 'pointer';
+    } else {
+      tip.style.display = 'none';
+      wfCanvas.style.cursor = 'default';
     }
-    chartCanvas.style.cursor='default';
-    var best=null,bestD=55;
-    chartCanvas._zones.forEach(function(z){var d=Math.abs(z.cx-mx);if(d<bestD){bestD=d;best=z;}});
-    if(best&&chartTip){
-      var epa=epaEff(ST.dt);
-      var pct=((best.eff-epa)/epa*100).toFixed(1);
-      var sign=+pct>=0?'+':'';
-      var rng=Math.round((ST.metric?best.eff/1.60934:best.eff)*CFG[ST.dt].pack*(ST.soh/100));
-      var bdelta=best.eff-best.baseEff;
-      var bpct=best.baseEff>0?(bdelta/best.baseEff*100).toFixed(1):'0';
-      chartTip.innerHTML='<b style="color:#fff">&#128663; '+dSpeed(best.mph)+'</b><br>'+
-        '<span style="color:#94a3b8">Efficiency: </span><b style="color:'+best.col+'">'+dEffL(best.eff)+' '+dUnit()+'</b><br>'+
-        '<span style="color:#94a3b8">vs EPA '+epa.toFixed(2)+': </span>'+
-        '<b style="color:'+(+pct>=0?'#22c55e':+pct>-5?'#facc15':'#f97316')+'">'+sign+pct+'%</b><br>'+
-        '<span style="color:#94a3b8">vs Perfect Day: </span>'+
-        '<b style="color:'+(bdelta>=0?'#22c55e':'#f87171')+'">'+(bdelta>=0?'+':'')+dEffL(bdelta)+' ('+( +bpct>=0?'+':'')+bpct+'%)</b><br>'+
-        '<span style="color:#94a3b8">&#128283; Modelled range: </span><b style="color:#e2e8f0">'+dRange(rng)+'</b>';
-      chartTip.style.maxWidth='210px';chartTip.style.lineHeight='1.9';
-      chartTip.style.display='block';
-      var tx=ev.clientX-r.left+12;if(tx+210>r.width)tx=ev.clientX-r.left-225;
-      chartTip.style.left=tx+'px';chartTip.style.top='60px';
-    }else if(chartTip){chartTip.style.display='none';}
   });
-  chartCanvas.addEventListener('mouseleave',function(){if(chartTip)chartTip.style.display='none';chartCanvas.style.cursor='default';});
-  chartCanvas.addEventListener('touchstart',function(ev){
-    if(!chartCanvas._epaZone)return;
-    var r=chartCanvas.getBoundingClientRect();
-    var touch=ev.touches[0];
-    var mx=touch.clientX-r.left,my=touch.clientY-r.top;
-    var ez=chartCanvas._epaZone;
-    if(ez&&mx>=ez.x&&mx<=ez.x+ez.w&&my>=ez.y&&my<=ez.y+ez.h){
+
+  // MOUSE LEAVE — only hide if nothing pinned
+  wfCanvas.addEventListener('mouseleave', function(){
+    if(!pinnedZone) tip.style.display = 'none';
+  });
+
+  // CLICK — first click pins open, second click or click on empty area closes
+  wfCanvas.addEventListener('click', function(ev){
+    var r = wfCanvas.getBoundingClientRect();
+    var mx = ev.clientX - r.left, my = ev.clientY - r.top;
+    var hit = null;
+    WF_ZONES.forEach(function(z){
+      if(mx>=z.x&&mx<=z.x+z.w&&my>=z.y&&my<=z.y+z.h) hit=z;
+    });
+    if(hit){
+      if(pinnedZone === hit){
+        hideTip(); // second click on same bar — close
+      } else {
+        pinnedZone = hit; // pin this bar open
+        showTip(hit, ev, r);
+      }
+    } else {
+      if(pinnedZone) hideTip(); // clicked empty space — close
+    }
+  });
+
+  // TOUCH — tap to pin, tap same bar or elsewhere to close
+  wfCanvas.addEventListener('touchstart', function(ev){
+    var r = wfCanvas.getBoundingClientRect();
+    var t = ev.touches[0];
+    var mx = t.clientX - r.left, my = t.clientY - r.top;
+    var hit = null;
+    WF_ZONES.forEach(function(z){
+      if(mx>=z.x&&mx<=z.x+z.w&&my>=z.y&&my<=z.y+z.h) hit=z;
+    });
+    if(hit){
       ev.preventDefault();
-      chartTip.innerHTML='<b style="color:#facc15">&#128202; EPA Reference Line</b><br><br>'+
-        '<span style="color:#94a3b8">GM combined rating: </span><b style="color:#facc15">'+ez.epa.toFixed(2)+' '+dUnit()+'</b><br><br>'+
-        '<span style="color:#cbd5e1">The EPA number reflects a standardized city/highway test cycle \u2014 varying speeds, stop-and-go, cold starts and accessory loads averaged together.</span><br><br>'+
-        '<span style="color:#cbd5e1">This app shows efficiency at a <b style="color:#fff">specific operating point</b> \u2014 one speed, one temperature, one set of conditions. Steady highway cruising in mild weather naturally exceeds the combined rating, just as a car\'s highway MPG exceeds its combined MPG.</span><br><br>'+
-        '<span style="color:#90EE90">Both numbers are correct \u2014 they measure different things.</span>';
-      chartTip.style.display='block';chartTip.style.maxWidth='260px';chartTip.style.lineHeight='1.7';
-      chartTip.style.left=Math.max(4,r.width/2-130)+'px';chartTip.style.top='50px';
-    }else{chartTip.style.display='none';}
+      if(pinnedZone === hit){
+        hideTip();
+      } else {
+        pinnedZone = hit;
+        showTip(hit, null, null);
+        // Centre tooltip on mobile
+        tip.style.left = Math.max(4, r.width/2 - 140) + 'px';
+        tip.style.top = '44px';
+      }
+    } else {
+      if(pinnedZone) hideTip();
+    }
   },{passive:false});
-  chartCanvas.addEventListener('touchend',function(){setTimeout(function(){if(chartTip)chartTip.style.display='none';},3500);});
-
-  try{new ResizeObserver(function(){drawChart();}).observe(cwrap);}catch(e){}
-  updateConditionsLine();
-  setTimeout(drawChart,0);
 }
 
 // ================================================================
-// BREAKDOWN VIEW
+// LEGEND
 // ================================================================
-function bBd(){
-  var card=el('div',{class:'card'});
-  card.appendChild(el('div',{style:{fontSize:'13px',fontWeight:'700',color:'#e2e8f0',marginBottom:'11px'}},
-    '⚡ Power Breakdown — '+dTemp(ST.ambientT)+' ambient'));
-  var srow=el('div',{style:{display:'flex',gap:'12px',flexWrap:'wrap',marginBottom:'12px'}});
-  var sd=el('div',null);
-  sd.appendChild(el('div',{style:{fontSize:'9px',color:'#64748b',fontWeight:'700',marginBottom:'3px'}},'🚗 SPEED'));
-  var sbr=el('div',{style:{display:'flex',gap:'4px'}});var sbtns={};
-  SPEEDS.forEach(function(s){
-    var lbl=ST.metric?Math.round(mToK(s)):s;
-    var b=el('button',{style:{padding:'5px 9px',borderRadius:'5px',fontFamily:'var(--mono)',
-      fontWeight:'700',fontSize:'12px',border:'none',cursor:'pointer',
-      background:ST.selSpd===s?'#2563eb':'#1e293b',color:ST.selSpd===s?'#fff':'#94a3b8'}},String(lbl));
-    b.addEventListener('click',function(){ST.selSpd=s;
-      Object.keys(sbtns).forEach(function(k){sbtns[k].style.background=+k===s?'#2563eb':'#1e293b';sbtns[k].style.color=+k===s?'#fff':'#94a3b8';});
-      updBd();});
-    sbtns[s]=b;sbr.appendChild(b);
+function buildLegend(bars){
+  var leg=document.getElementById('wf-legend');
+  leg.innerHTML='';
+  bars.forEach(function(b){
+    var d=document.createElement('div');d.className='wf-leg';
+    var dot=document.createElement('div');dot.className='wf-leg-dot';dot.style.background=b.color;
+    var lbl=document.createElement('span');lbl.textContent=b.emoji+' '+b.label;
+    d.appendChild(dot);d.appendChild(lbl);leg.appendChild(d);
   });
-  sd.appendChild(sbr);srow.appendChild(sd);
-  var dd=el('div',null);
-  dd.appendChild(el('div',{style:{fontSize:'9px',color:'#64748b',fontWeight:'700',marginBottom:'3px'}},'⚡ DRIVETRAIN'));
-  var dbr=el('div',{style:{display:'flex',gap:'4px'}});var dbbtns={};
-  [['fwd','⚡ FWD','#2563eb'],['awd','⚡⚡ AWD','#7c3aed']].forEach(function(r){
-    var b=el('button',{style:{padding:'5px 12px',borderRadius:'5px',fontWeight:'700',fontSize:'12px',border:'none',
-      cursor:'pointer',background:ST.dt===r[0]?r[2]:'#1e293b',color:ST.dt===r[0]?'#fff':'#94a3b8'}},r[1]);
-    b.addEventListener('click',function(){ST.dt=r[0];updDT();
-      [['fwd','#2563eb'],['awd','#7c3aed']].forEach(function(x){dbbtns[x[0]].style.background=ST.dt===x[0]?x[1]:'#1e293b';dbbtns[x[0]].style.color=ST.dt===x[0]?'#fff':'#94a3b8';});
-      updBd();});
-    dbbtns[r[0]]=b;dbr.appendChild(b);
-  });
-  dd.appendChild(dbr);srow.appendChild(dd);
-  card.appendChild(srow);
-  var strip=el('div',{class:'mini sum-strip'});strip.id='bd-strip';card.appendChild(strip);
-  var barsDiv=el('div',null);barsDiv.id='bd-bars';card.appendChild(barsDiv);
-  tabContent.appendChild(card);
-  updBd();
+}
 
-  function updBd(){
-    var c=CFG[ST.dt],bd=c6(ST.selSpd,ST.ambientT,ST.dt);
-    var tot=bd.Pb/1000,effD=ST.metric?bd.eff*1.60934:bd.eff;
-    var ss=$id('bd-strip');ss.innerHTML='';
-    [['🔌 Battery',(bd.Pb/1000).toFixed(2)+' kW','#fff'],
-     [dUnit(),effD.toFixed(3),effCol(bd.eff,ST.dt)],
-     ['🗺️ Modelled Range',dRange(Math.round(bd.eff*(c.pack*(ST.soh/100)))),'#e2e8f0'],
-     ['💨 Aero Speed',dSpeed(ST.selSpd+ST.wind),ST.wind!==0?'#fbbf24':'#94a3b8'],
-     ['⚖️ Total Mass',dMass(bd.mass),'#a78bfa'],
-     ['🌡️ Cabin dT',Math.abs(ST.cabinT-ST.ambientT)+(ST.metric?' C':' F'),Math.abs(ST.cabinT-ST.ambientT)>30?'#f87171':'#94a3b8']
-    ].forEach(function(r){
-      var d=el('div',{style:{textAlign:'center'}});
-      d.appendChild(el('div',{style:{fontSize:'9px',color:'#64748b',fontWeight:'600',marginBottom:'2px'}},r[0]));
-      d.appendChild(el('div',{class:'mono',style:{fontSize:'17px',fontWeight:'700',color:r[2]}},r[1]));
-      ss.appendChild(d);
-    });
-    var bars=$id('bd-bars');bars.innerHTML='';
-    [['💨 Aero Drag (v='+dSpeed(ST.selSpd+ST.wind)+')','#3b82f6',bd.Pa,'0.5*rho*Cd*A*v³'],
-     ['🛞 Rolling Resistance','#8b5cf6',bd.Pr,'Crr='+bd.Crr.toFixed(4)+(c.awd?' +AWD bearing':'')],
-     ['⛰️ Road Grade ('+ST.grade+'%)','#6366f1',bd.Pg,ST.grade===0?'Level road':ST.grade>0?'Uphill':'Downhill'],
-     ['⚙️ Drivetrain Loss (eta='+c.eta+')','#4f46e5',bd.Pt-(bd.Pa+bd.Pr+bd.Pg),c.awd?'Dual motor':'Single motor'],
-     ['🌡️ HVAC dT='+Math.abs(ST.cabinT-ST.ambientT)+(ST.metric?' C':' F')+' COP='+(ST.ambientT<ST.cabinT?hpCOP(ST.ambientT):acCOP(ST.ambientT)).toFixed(1),'#f59e0b',bd.Ph,ST.ambientT<ST.cabinT?'🔥 Heat pump':'❄️ A/C'],
-     ['🪑 Seat Heaters ('+(ST.seat?'ON':'OFF')+')','#f97316',bd.Ps,'140W'],
-     ['🎡 Wheel Heater ('+(ST.whl?'ON':'OFF')+')','#fb923c',bd.Pw,'25W'],
-     ['🪟 Rear Defrost ('+(ST.defrost?'ON':'OFF')+')','#e879f9',bd.Pd,'~250W grid'],
-     ['🔌 Base Accessories','#64748b',PACC,'400W fixed'],
-     ['🚦 Traffic HVAC scale ('+TRAFFIC_MODES[ST.traffic].label+')','#f472b6',bd.Ph-bd.Ph_raw,'Per-mile HVAC scaling'],
-     [(SOLAR_LOADS[ST.solar]>0?'☀️':'💡')+' Solar+Occupant heat','#fbbf24',bd.solarW+bd.occupantW,bd.solarW>0?'Solar '+bd.solarW+'W + occupants '+bd.occupantW+'W':'Occupant heat '+bd.occupantW+'W (AC only)'],
-     ['🔋 Battery Ri Loss (eta='+bd.be.toFixed(3)+')','#ec4899',bd.Pb-(bd.Pt+bd.Ph+bd.Ps+bd.Pw+bd.Pd+PACC),'Low-temp resistance loss'],
-    ].forEach(function(r){
-      var val=r[2]/1000,pct=Math.min(100,Math.max(0,(val/tot)*100));
-      var w2=el('div',{style:{marginBottom:'9px'}});
-      var rw=el('div',{style:{display:'flex',justifyContent:'space-between',fontSize:'10px',marginBottom:'2px'}});
-      rw.appendChild(el('span',{style:{color:'#cbd5e1'}},r[0]));
-      var rv=el('span',{class:'mono',style:{color:'#e2e8f0'}});
-      rv.textContent=val.toFixed(2)+' kW ';
-      rv.appendChild(el('span',{style:{color:'#475569'}},'('+pct.toFixed(0)+'%)'));
-      rw.appendChild(rv);w2.appendChild(rw);
-      var bg=el('div',{class:'barbg'});
-      bg.appendChild(el('div',{class:'barfill',style:{width:Math.max(pct,val>0?1:0)+'%',background:r[1]}}));
-      w2.appendChild(bg);
-      if(r[3])w2.appendChild(el('div',{class:'mono',style:{fontSize:'9px',color:'#475569',marginTop:'1px'}},r[3]));
-      bars.appendChild(w2);
-    });
+// ================================================================
+// PLAIN ENGLISH SUMMARY
+// ================================================================
+function buildPlainText(data){
+  var lost=data.baseKm-data.actualKm;
+  var pct=Math.round(lost/data.baseKm*100);
+  var season=SEL[1],drive=SEL[2];
+
+  var hvacBar=data.bars.filter(function(b){return b.label==='Cabin heating'||b.label==='Air conditioning';})[0];
+  var batBar=data.bars.filter(function(b){return b.label==='Cold battery';})[0];
+  var trafficBar=data.bars.filter(function(b){return b.label==='Stop & go';})[0];
+
+  var hvacKm=hvacBar?hvacBar.km:0;
+  var batKm=batBar?batBar.km:0;
+  var trafficKm=trafficBar?trafficBar.km:0;
+
+  var biggest=data.bars.filter(function(b){return b.isLoss;}).sort(function(a,b){return b.km-a.km;})[0];
+
+  var seasonal='';
+  if(season==='deep_winter'||season==='mild_winter'){
+    seasonal='Winter is the hardest season for any EV. Cold temperatures affect both the battery chemistry and force the heating system to work continuously.';
+  } else if(season==='hot_summer'){
+    seasonal='Hot weather A/C and slightly reduced battery efficiency combine for a modest range impact — much less severe than winter.';
+  } else {
+    seasonal='These are near-ideal driving conditions. Your range is close to the rated figure.';
   }
+
+  var actualDisp=dDisp(data.actualKm), baseDisp=dDisp(data.baseKm), lostDisp=dDisp(lost);
+  var html='Your Equinox EV is showing <strong>'+actualDisp+'</strong> today instead of the rated <strong>'+baseDisp+'</strong> — a difference of <strong>'+lostDisp+' ('+pct+'%)</strong>. ';
+  if(biggest){
+    html+='The biggest factor is <span class="highlight">'+biggest.emoji+' '+biggest.label+' ('+dDisp(biggest.km)+')</span>. ';
+  }
+  html+=seasonal;
+  if(hvacKm>20){
+    html+=' <strong>Nothing is wrong with your car</strong> — this is consistent with what physics models predict for these conditions.';
+  }
+
+  document.getElementById('plain-text').innerHTML=html;
 }
 
 // ================================================================
-// TABLE VIEW
+// SHOW RESULT
 // ================================================================
-function bTable(){
-  var card=el('div',{class:'card',style:{overflowX:'auto'}});
-  card.appendChild(el('div',{style:{fontSize:'13px',fontWeight:'700',color:'#e2e8f0',marginBottom:'8px'}},
-    '📋 Data Table — '+dUnit()+' | kW | modelled range (estimate)'));
-  ['fwd','awd'].forEach(function(dk){
-    var c=CFG[dk];
-    var er=ST.metric?Math.round(mToK(c.epa_mi))+' km':c.epa_mi+' mi';
-    var hd=el('div',{style:{fontSize:'10px',fontWeight:'700',margin:'10px 0 4px',color:dk==='fwd'?'#60a5fa':'#a78bfa'}});
-    hd.textContent=(dk==='fwd'?'⚡ ':'⚡⚡ ')+c.label+' — EPA '+er+' | '+c.mpge+' MPGe | eta='+c.eta+' | '+c.pack+' kWh';
-    card.appendChild(hd);
-    var tbl=el('table',null);
-    var thead=el('thead',null),hr=el('tr',null);
-    hr.appendChild(el('th',null,'🚗 Speed'));
-    TEMPS_F.forEach(function(t,i){hr.appendChild(el('th',{style:{color:TCLR[i]}},dTemp(t)));});
-    thead.appendChild(hr);tbl.appendChild(thead);
-    var tbody=el('tbody',null);
-    SPEEDS.forEach(function(mph){
-      var row=el('tr',null);
-      row.appendChild(el('td',{class:'mono',style:{fontWeight:'700',color:'#e2e8f0'}},dSpeed(mph)));
-      TEMPS_F.forEach(function(t){
-        var p=calcI(mph,t,dk,BASE_CASE.cabinT,false,false,false,0,1,0,false,42,0,'cruise','none',0,100);
-        var eff=ST.metric?p.eff*1.60934:p.eff;
-        var col=effCol(p.eff,dk);
-        var td2=el('td',null);
-        td2.appendChild(el('div',{class:'mono',style:{fontWeight:'700',fontSize:'12px',color:col}},eff.toFixed(2)));
-        td2.appendChild(el('div',{class:'mono',style:{fontSize:'9px',color:'#64748b'}},(p.Pb/1000).toFixed(1)+' kW'));
-        td2.appendChild(el('div',{class:'mono',style:{fontSize:'9px',color:'#475569'}},'🔋 ~'+dRange(Math.round(p.eff*(c.pack*(ST.soh/100))))));
-        row.appendChild(td2);
-      });
-      tbody.appendChild(row);
-    });
-    tbl.appendChild(tbody);card.appendChild(tbl);
-  });
-  tabContent.appendChild(card);
+function showResult(){
+  if(!SEL[1]||!SEL[2]||!SEL[3])return;
+
+  var data=buildWaterfall(SEL[1],SEL[2],SEL[3]);
+  WF_DATA=data;
+
+  // Update header
+  var seasonLabel=PRESETS[SEL[1]].label;
+  document.getElementById('result-title').textContent='Here\'s where your range went';
+  document.getElementById('result-sub').textContent=
+    seasonLabel+' · '+(SEL[2]==='city'?'City driving':SEL[2]==='highway'?'Highway':'Mixed driving')+
+    ' · '+(data.dk==='fwd'?'FWD Single Motor':'AWD Dual Motor')+
+    ' · '+(METRIC?'Kilometres':'Miles');
+
+  document.getElementById('guided').style.display='none';
+  document.getElementById('result').style.display='block';
+  window.scrollTo(0,0);
+
+  // Draw after DOM settles
+  setTimeout(function(){
+    drawWaterfall(data);
+    buildLegend(data.bars);
+    buildPlainText(data);
+    initTooltip();
+
+    // Redraw on resize
+    var ro=new ResizeObserver(function(){drawWaterfall(WF_DATA);});
+    ro.observe(document.getElementById('wf-canvas-wrap'));
+  },80);
 }
 
-// ================================================================
-// MODEL VIEW
-// ================================================================
-function bModel(){
-  var card=el('div',{class:'card'});
-  card.appendChild(el('div',{style:{fontSize:'13px',fontWeight:'700',color:'#e2e8f0',marginBottom:'10px'}},
-    '🔬 Engineering Model — Parameters & Equations'));
-  var pg=el('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:'6px',marginBottom:'10px'}});
-  [['⚖️ Base mass (FWD)','2041 kg (4499 lb)'],['⚖️ AWD extra mass','+68 kg (motor+diff)'],
-   ['💨 Drag coefficient Cd','0.29 | +0.10 roof box'],['📐 Frontal area A','2.60 m² | +0.25 roof box'],
-   ['⚡ FWD drivetrain eta','88.2% (EPA 108 MPGe)'],['⚡⚡ AWD drivetrain eta','84.8% (EPA 96 MPGe = 2.848 mi/kWh wall)'],
-   ['⚙️ AWD rear bearing drag','Crr +0.0004 equiv.'],['🛞 Rolling resistance Crr','0.009 @42 PSI nominal'],
-   ['🛞 Crr pressure sensitivity','+0.00015 per PSI under 36'],['🌡️ Cabin heat transfer UA','160 W/°F'],
-   ['🔥 Heat pump COP @0°F','1.0 (full PTC resistive)'],['🔥 Heat pump COP @20°F','1.55'],
-   ['🔥 Heat pump COP @45°F+','2.5–3.0'],['❄️ A/C COP (base)','3.0 | −5–12% traffic penalty'],
-   ['☀️ Solar gain full sun','500W thermal through glass'],['👤 Occupant metabolic heat','100W per person (AC)'],
-   ['🔋 Battery eta @60°F+','1.000'],['🔋 Battery eta @40°F','0.975'],
-   ['🔋 Battery eta @20°F','0.945'],['🔋 Battery eta @5°F','0.905'],
-   ['🔋 Battery eta @0°F','0.875'],['🔋 Usable pack','79 kWh (GM rated) — real-world new vehicle ~89–90 kWh reported'],
-   ['📊 EPA efficiency basis','Wall-to-wheels (MPGe÷33.705): FWD=3.204 mi/kWh | AWD=2.848 mi/kWh'],
-   ['🔌 Base accessories','400W (12V, lights, ctrl)'],['🪑 Seat heaters x2','140W resistive'],
-   ['🎡 Steering wheel heater','25W resistive'],['🪟 Rear defrost+mirrors','~250W resistive'],
-   ['🔋 Base case definition','70°F · calm · solo · 42PSI · cruise · 100% SOH'],
-   ['🏔️ Altitude model','ISA std atmosphere rho*(1-2.2558e-5*h)^5.2559'],
-   ['⚠️ Disclaimer','Educational estimates only · Not affiliated with GM · Real-world results vary'],
-   ['🔋 SOH effect','Range (kWh) + small Ri loss: 80% SOH ≈ 2% extra battery loss'],
-   ['🛞 Load Crr scaling','+0.00004 per 100kg over base mass (tire deformation)'],
-   ['🔥 Heat pump COP','Linear interp: 1.0@0°F → 1.55@20°F → 2.0@30°F → 2.5@45°F → 3.0@60°F+'],
-  ].forEach(function(r){
-    var d=el('div',{class:'mini',style:{display:'flex',justifyContent:'space-between',gap:'6px',marginBottom:'0'}});
-    d.appendChild(el('span',{style:{fontSize:'10px',color:'#64748b'}},r[0]));
-    d.appendChild(el('span',{class:'mono',style:{fontSize:'10px',color:'#e2e8f0',fontWeight:'600',textAlign:'right'}},r[1]));
-    pg.appendChild(d);
-  });
-  card.appendChild(pg);
-  card.appendChild(el('div',{style:{fontSize:'10px',color:'#64748b',fontWeight:'700',marginBottom:'4px',textTransform:'uppercase',letterSpacing:'.06em'}},'📐 Core Equations'));
-  card.appendChild(el('pre',null,
-    '-- Traction --\nP_aero  = 0.5 * rho(T,alt) * Cd * A * (v + v_wind)³\nP_roll  = Crr(PSI,AWD) * m * g * v\nP_grade = m * g * sin(arctan(grade/100)) * v\nP_tract = (P_aero + P_roll + P_grade) / eta_drivetrain\n\n-- HVAC (traffic-mode scaled) --\nHEATING: P_hvac = UA_eff * dT / COP_hp(T_amb) * (v / v_avg)\nCOOLING: P_hvac = (UA_eff*|dT| + P_solar + P_occ) * 0.55 / COP_ac * (v / v_avg)\n\n-- Battery draw --\nP_batt = (P_tract + P_hvac + P_accessories) / eta_bat(T_amb)\n\n-- Efficiency --\neff = v_mph / P_batt_kW    [mi/kWh]\n\n-- Ghost bar base case --\nBase: 70°F ambient, 72°F cabin, 0 wind, 0 grade, 1 pax,\n      0 cargo, 42 PSI, cruise, no solar, sea level, 100% SOH'));
-  tabContent.appendChild(card);
+// Animate bars in on draw
+// (The draw function runs immediately; animation is handled via requestAnimationFrame)
+(function animateWaterfall(){
+  var progress=0,targetData=null;
+  window._animateWF=function(data){
+    targetData=data;progress=0;
+    function frame(){
+      progress=Math.min(1,progress+0.035);
+      // draw with progress scale on bar heights
+      drawWaterfallAnimated(data,progress);
+      if(progress<1)requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  };
+})();
+
+// Init unit toggle default
+document.getElementById('ut-km').classList.add('active');
+
+function drawWaterfallAnimated(data,p){
+  // scale each bar height by p (ease out)
+  var ep=1-Math.pow(1-p,3);
+  var animData=JSON.parse(JSON.stringify(data));
+  animData.bars=animData.bars.map(function(b){return Object.assign({},b,{km:Math.round(b.km*ep)});});
+  drawWaterfall(animData);
 }
 
-// ================================================================
-// ANALYTICS — fire and forget, never blocks UI
-// ================================================================
-function track(event, value) {
-  try {
-    fetch('/.netlify/functions/track', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({event: event, value: String(value)})
-    }).catch(function(){});
-  } catch(e) {}
-}
-
-buildApp();
+// Override showResult to use animation
+var _origShowResult=showResult;
+showResult=function(){
+  if(!SEL[1]||!SEL[2]||!SEL[3])return;
+  var data=buildWaterfall(SEL[1],SEL[2],SEL[3]);
+  WF_DATA=data;
+  document.getElementById('result-title').textContent='Here\'s where your range went';
+  var seasonLabel=PRESETS[SEL[1]].label;
+  document.getElementById('result-sub').textContent=
+    seasonLabel+' · '+(SEL[2]==='city'?'City driving':SEL[2]==='highway'?'Highway':'Mixed driving')+
+    ' · '+(data.dk==='fwd'?'FWD Single Motor':'AWD Dual Motor');
+  document.getElementById('guided').style.display='none';
+  document.getElementById('result').style.display='block';
+  window.scrollTo(0,0);
+  setTimeout(function(){
+    buildLegend(data.bars);
+    buildPlainText(data);
+    initTooltip();
+    window._animateWF(data);
+    var ro=new ResizeObserver(function(){drawWaterfall(WF_DATA);});
+    ro.observe(document.getElementById('wf-canvas-wrap'));
+  },80);
+};
 </script>
 </body>
 </html>
